@@ -33,6 +33,11 @@ services:
       reaction:
     ports:
       - 84:4000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`rc.craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=4000"
 
 
   api:
@@ -47,6 +52,11 @@ services:
       - api_empty_node_modules:/usr/local/src/app/node_modules
     ports:
       - 8484:4000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`rc.api.craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=4000"
 
 volumes:
   web-yarn:

@@ -27,6 +27,11 @@ services:
 
     ports:
       - 81:2300
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=2300"
     volumes:
       - .:/usr/local/src/app
       - web-yarn:/home/node/.cache/yarn
@@ -48,6 +53,11 @@ services:
       - api_empty_node_modules:/usr/local/src/app/node_modules
     ports:
       - 8181:4000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`api.craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=4000"
 
 volumes:
   web-yarn:

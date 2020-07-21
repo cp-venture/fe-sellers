@@ -27,6 +27,11 @@ services:
 
     ports:
       - 82:2300
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`prod.craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=2300"
     volumes:
       - .:/usr/local/src/app
       - web-yarn:/home/node/.cache/yarn
@@ -34,6 +39,7 @@ services:
       # This allows IDEs to run lint etc with native add-ons for host OS
       # Without interfering with native add-ons in container
       - empty_node_modules:/usr/local/src/app/node_modules
+
 
 
   api:
@@ -48,6 +54,11 @@ services:
       - api_empty_node_modules:/usr/local/src/app/node_modules
     ports:
       - 8282:4000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`prod.api.craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=4000"
 
 volumes:
   web-yarn:
