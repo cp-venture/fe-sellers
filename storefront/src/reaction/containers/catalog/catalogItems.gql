@@ -14,6 +14,7 @@ query catalogItemsQuery($shopId: ID!, $tagIds: [ID] $first: ConnectionLimitInt, 
         ... on CatalogItemProduct {
           product {
             _id
+            productId
             title
             slug
             description
@@ -23,8 +24,31 @@ query catalogItemsQuery($shopId: ID!, $tagIds: [ID] $first: ConnectionLimitInt, 
             isBackorder
             variants {
               _id
+              variantId
+               pricing {
+                 compareAtPrice {
+                   displayAmount
+                 }
+                 currency {
+                   code
+                 }
+                 price
+                 displayPrice
+               }
+
               options {
                  _id
+                 variantId
+                 pricing {
+                   compareAtPrice {
+                     displayAmount
+                   }
+                   currency {
+                     code
+                   }
+                   price
+                   displayPrice
+                 }
               }
             }
             metafields {
@@ -47,6 +71,7 @@ query catalogItemsQuery($shopId: ID!, $tagIds: [ID] $first: ConnectionLimitInt, 
               currency {
                 code
               }
+              price
               displayPrice
               minPrice
               maxPrice

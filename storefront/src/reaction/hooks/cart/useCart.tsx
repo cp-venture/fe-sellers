@@ -108,6 +108,7 @@ export default function useCart() {
     onCompleted(addOrCreateCartMutationData) {
       if (addOrCreateCartMutationData && addOrCreateCartMutationData.createCart && (!viewer || !viewer._id)) {
         const { cart: cartPayload, token } = addOrCreateCartMutationData.createCart;
+        console.log(addOrCreateCartMutationData)
         cartStore.setAnonymousCartCredentials(cartPayload._id, token);
       }
       refetchCart();

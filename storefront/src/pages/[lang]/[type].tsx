@@ -27,6 +27,7 @@ import fetchTranslations from "staticUtils/translations/fetchTranslations";
 import {withApollo} from "lib/apollo/withApollo";
 import inject from "hocs/inject";
 import withCatalogItems from "containers/catalog/withCatalogItems";
+import withCart from "containers/cart/withCart";
 
 const Sidebar = dynamic(() => import('layouts/sidebar/sidebar'));
 const Products = dynamic(() =>

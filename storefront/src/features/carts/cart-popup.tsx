@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 import { openModal, closeModal } from '@redq/reuse-modal';
 import Cart from './cart';
 import CartPopupButton, {
-  BoxedCartButton,
+  BoxedCartButton
 } from 'components/cart-popup/cart-popup-button';
 import { CURRENCY } from 'utils/constant';
 import { CartSlidePopup } from './cart.style';
@@ -64,13 +64,14 @@ type CartProps = {
 
 const CartPopUp: React.FC<CartProps> = ({
   deviceType: { mobile, tablet, desktop },
-  ...cart
+  ...useReactionCart
 }) => {
   let { isOpen, cartItemsCount, toggleCart, calculatePrice } = useCart();
 
-  console.log(cartItemsCount)
-  cartItemsCount = cart.totalItems
-  console.log(cart)
+  cartItemsCount = useReactionCart.cart.totalItemQuantity
+  calculatePrice = () => useReactionCart.cart.checkout ? useReactionCart.cart.checkout.summary.total.amount : 0
+  console.log("asdfsdf lakshyy", useReactionCart)
+
 
   const handleModal = () => {
     openModal({
@@ -119,7 +120,7 @@ const CartPopUp: React.FC<CartProps> = ({
         <>
           <CartSlidePopup className={cartSliderClass}>
             {isOpen && (
-              <Cart cartProps={cart} onCloseBtnClick={toggleCart} scrollbarHeight="100vh" />
+              <Cart  useReactionCart = {useReactionCart} onCloseBtnClick={toggleCart} scrollbarHeight="100vh" />
             )}
           </CartSlidePopup>
 

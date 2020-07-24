@@ -51,8 +51,9 @@ const Cart: React.FC<CartPropsType> = ({
   className,
   onCloseBtnClick,
   scrollbarHeight,
+  useReactionCart
 }) => {
-  const {
+  let {
     items,
     coupon,
     addItem,
@@ -62,6 +63,13 @@ const Cart: React.FC<CartPropsType> = ({
     calculatePrice,
     applyCoupon,
   } = useCart();
+
+
+  items = useReactionCart.cart.items
+  cartItemsCount = useReactionCart.cart.totalItemQuantity
+  calculatePrice = () => useReactionCart.cart.checkout ? useReactionCart.cart.checkout.summary.total.amount : 0
+
+
   const [couponText, setCoupon] = useState('');
   const [displayCoupon, showCoupon] = useState(false);
   const [error, setError] = useState('');

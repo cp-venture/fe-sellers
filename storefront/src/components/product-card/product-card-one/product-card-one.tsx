@@ -17,6 +17,7 @@ import { CartIcon } from 'assets/icons/CartIcon';
 import priceByCurrencyCode from "lib/utils/priceByCurrencyCode";
 import variantById from "lib/utils/variantById";
 import inject from "hocs/inject";
+import withCart from "containers/cart/withCart";
 
 type ProductCardProps = {
   title: string;
@@ -60,44 +61,65 @@ const ProductCard: React.FC<ProductCardProps> = ({
   ...props
 }) => {
   const { addItemsToCart, onRemoveCartItems, cart } = useCart();
+
+  const product = data
+  const currencyCode = "USD"
+  let SelectedVariantId, SelectedOptionId
+
+  const selectVariant = (variant, optionId) => {
+
+    // Select the variant, and if it has options, the first option
+    const variantId = variant._id;
+    let selectOptionId = optionId;
+    if (!selectOptionId && variant.options && variant.options.length) {
+      selectOptionId = variant.options[0]._id;
+    }
+    SelectedVariantId = variantId
+    SelectedOptionId = selectOptionId
+    //setPDPSelectedVariantId(variantId, selectOptionId);
+  }
+
+  const determineProductPrice = ()=>{
+
+
+    const selectedVariant = variantById(product.variants, SelectedVariantId);
+    let productPrice = {};
+
+    if (SelectedOptionId && selectedVariant) {
+      const selectedOption = variantById(selectedVariant.options, SelectedOptionId);
+      productPrice = priceByCurrencyCode(currencyCode, selectedOption.pricing);
+    } else if (!SelectedOptionId && selectedVariant) {
+      productPrice = priceByCurrencyCode(currencyCode, selectedVariant.pricing);
+    }
+
+    return productPrice;
+  }
+
+  selectVariant(product.variants[0], null);
+  const productPrice = determineProductPrice();
+  const compareAtDisplayPrice = (productPrice.compareAtPrice && productPrice.compareAtPrice.displayAmount) || null;
+
+
   const handleAddClick = (e) => {
     e.stopPropagation();
     cartAnimation(e);
+    console.log(price)
 
-    const product = data
-    let selectedVariant
-    const selectVariant = (variant, optionId) => {
-
-      // Select the variant, and if it has options, the first option
-      const variantId = variant._id;
-      let selectOptionId = optionId;
-      if (!selectOptionId && variant.options && variant.options.length) {
-          selectOptionId = variant.options[0]._id;
-      }
-      selectedVariant = variantId
-      setPDPSelectedVariantId(variantId, selectOptionId);
-    }
-    selectVariant(product.variants[0], null);
-
-
-    // const selectedVariant = variantById(product.variants, pdpSelectedVariantId);
-    const selectedOption = variantById(selectedVariant.options, pdpSelectedOptionId);
+    const selectedVariant = variantById(product.variants, SelectedVariantId);
+    const selectedOption = variantById(selectedVariant.options, SelectedOptionId);
     const selectedVariantOrOption = selectedOption || selectedVariant;
-    const currencyCode = "USD"
-    const price = priceByCurrencyCode(currencyCode, product.pricing);
-    // price.price
 
     // Call addItemsToCart with an object matching the GraphQL `CartItemInput` schema
-    const quantity = 1
+    let quantity = 1.0
     addItemsToCart([
       {
         price: {
-          amount: price.price,
+          amount: productPrice.price,
           currencyCode
         },
         productConfiguration: {
-          productId: product._id, // Pass the productId, not to be confused with _id
-          productVariantId: selectedVariantOrOption.variantId // Pass the variantId, not to be confused with _id
+          productId: product.productId, // Pass the productId, not to be confused with _id
+          productVariantId: selectedVariantOrOption.variantId // Pass the variantId, not to be confused with
         },
         quantity
       }
@@ -138,7 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {discountInPercent ? (
               <span className="discountedPrice">
                 {currency}
-                {price}
+                {compareAtDisplayPrice ? compareAtDisplayPrice : productPrice.price}
               </span>
             ) : (
               ''
@@ -146,7 +168,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
             <span className="product-price">
               {currency}
-              {salePrice ? salePrice : price}
+              {productPrice.price}
             </span>
           </div>
 
@@ -175,4 +197,4 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
 };
 
-export default inject('uiStore')(ProductCard);
+export default withCart(inject('uiStore')(ProductCard));

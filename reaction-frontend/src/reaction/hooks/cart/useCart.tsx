@@ -107,6 +107,7 @@ export default function useCart() {
   }] = useMutation(cart && cart._id ? addCartItemsMutation : createCartMutation, {
     onCompleted(addOrCreateCartMutationData) {
       if (addOrCreateCartMutationData && addOrCreateCartMutationData.createCart && (!viewer || !viewer._id)) {
+        console.log(addOrCreateCartMutationData)
         const { cart: cartPayload, token } = addOrCreateCartMutationData.createCart;
         cartStore.setAnonymousCartCredentials(cartPayload._id, token);
       }
