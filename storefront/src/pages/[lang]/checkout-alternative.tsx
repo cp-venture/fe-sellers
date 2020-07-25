@@ -2,12 +2,12 @@ import React from 'react';
 import { NextPage } from 'next';
 import { useQuery } from '@apollo/react-hooks';
 import { Modal } from '@redq/reuse-modal';
-import { SEO } from 'components/seo';
-import Checkout from 'features/checkouts/checkout-one/checkout-one';
-import { GET_LOGGED_IN_CUSTOMER } from 'graphql/query/customer.query';
+import { SEO } from 'src/components/seo';
+import Checkout from 'src/features/checkouts/checkout-one/checkout-one';
+import { GET_LOGGED_IN_CUSTOMER } from 'src/graphql/query/customer.query';
 
-import { ProfileProvider } from 'contexts/profile/profile.provider';
-import ErrorMessage from 'components/error-message/error-message';
+import { ProfileProvider } from 'src/contexts/profile/profile.provider';
+import ErrorMessage from 'src/components/error-message/error-message';
 
 type Props = {
   deviceType: {
