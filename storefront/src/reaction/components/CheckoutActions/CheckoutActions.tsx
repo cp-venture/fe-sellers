@@ -128,13 +128,11 @@ class CheckoutActions extends Component {
       fulfillmentGroupId: fulfillmentGroups[0]._id,
       fulfillmentMethodId: shippingMethod.selectedFulfillmentOption.fulfillmentMethod._id
     };
-
     await onSetFulfillmentOption(fulfillmentOption);
   };
 
   handlePaymentSubmit = (paymentInput) => {
     this.props.cartStore.addCheckoutPayment(paymentInput);
-
     this.setState({
       hasPaymentError: false,
       actionAlerts: {

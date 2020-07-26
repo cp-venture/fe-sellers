@@ -47,7 +47,7 @@ import CheckoutWrapper, {
   Bold,
   Small,
   NoProductMsg,
-  IconWrapper,
+  IconWrapper, SubHeadings,
 } from './checkout-two.style';
 
 import { Plus } from 'assets/icons/PlusMinus';
@@ -61,43 +61,69 @@ import { useCart } from 'contexts/cart/use-cart';
 import { APPLY_COUPON } from 'graphql/mutation/coupon';
 import { useLocale } from 'contexts/language/language.provider';
 import { useWindowSize } from 'utils/useWindowSize';
+import {Header, SavedCard} from "src/components/payment-group/payment-group.style";
+import {placeOrderMutation} from "hooks/orders/placeOrder.gql";
+import PageLoading from "components/PageLoading/PageLoading";
+import calculateRemainderDue from "lib/utils/calculateRemainderDue";
+
+
+///reaction imports
+import { isEqual } from "lodash";
+import Actions from "@reactioncommerce/components/CheckoutActions/v1";
+import ShippingAddressCheckoutAction from "@reactioncommerce/components/ShippingAddressCheckoutAction/v1";
+import FulfillmentOptionsCheckoutAction from "@reactioncommerce/components/FulfillmentOptionsCheckoutAction/v1";
+import PaymentsCheckoutAction from "@reactioncommerce/components/PaymentsCheckoutAction/v1";
+import FinalReviewCheckoutAction from "@reactioncommerce/components/FinalReviewCheckoutAction/v1";
+import { addTypographyStyles } from "@reactioncommerce/components/utils";
+import withAddressValidation from "containers/address/withAddressValidation";
+import Dialog from "@material-ui/core/Dialog";
+
+import styled from "styled-components";
+const MessageDiv = styled.div`
+  ${addTypographyStyles("NoPaymentMethodsMessage", "bodyText")}
+`;
+
+const NoPaymentMethodsMessage = () => <MessageDiv>No payment methods available</MessageDiv>;
+
+NoPaymentMethodsMessage.renderComplete = () => "";
+
+///reaction imports
 
 // The type of props Checkout Form receives
-interface MyFormProps {
-  token: string;
-  deviceType: any;
-}
+// interface MyFormProps {
+//   token: string;
+//   deviceType: any;
+// }
 
 type CartItemProps = {
   product: any;
 };
 
 const OrderItem: React.FC<CartItemProps> = ({ product }) => {
-  const { id, quantity, title, name, unit, price, salePrice } = product;
-  const displayPrice = salePrice ? salePrice : price;
+  const {price} = product
+  const displayPrice = price.displayAmount ? price.displayAmount : price.amount;
   return (
-    <Items key={id}>
-      <Quantity>{quantity}</Quantity>
+    <Items key={product._id}>
+      <Quantity>{product.quantity}</Quantity>
       <Multiplier>x</Multiplier>
       <ItemInfo>
-        {name ? name : title} {unit ? `| ${unit}` : ''}
+        {name ? name : product.title} {product.optionTitle ? `| ${product.optionTitle}` : ''}
       </ItemInfo>
       <Price>
         {CURRENCY}
-        {(displayPrice * quantity).toFixed(2)}
+        {(price.amount * product.quantity).toFixed(2)}
       </Price>
     </Items>
   );
 };
 
-const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
+const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
   const [hasCoupon, setHasCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setError] = useState('');
   const { state, dispatch } = useContext(ProfileContext);
   const { isRtl } = useLocale();
   const {
-    items,
     removeCoupon,
     coupon,
     applyCoupon,
@@ -118,6 +144,8 @@ const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
   const [deletePaymentCardMutation] = useMutation(DELETE_CARD);
   const [appliedCoupon] = useMutation(APPLY_COUPON);
   const size = useWindowSize();
+  console.log(props)
+  // return (<></>)
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -214,11 +242,344 @@ const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
     setCouponCode(code);
   };
 
+/// rection checkout start here: cart/checkout.tsx
+//
+//   let _isMounted = false;
+//
+//   const {RState, setRState} = useState({
+//     actionAlerts: {
+//       1: null,
+//       2: null,
+//       3: null,
+//       4: null
+//     },
+//     hasPaymentError: false,
+//     isPlacingOrder: false
+//   });
+//
+//   useEffect(({ addressValidationResults: prevAddressValidationResults }) => {
+//     const { addressValidationResults } = props;
+//     if (
+//       addressValidationResults &&
+//       prevAddressValidationResults &&
+//       !isEqual(addressValidationResults, prevAddressValidationResults)
+//     ) {
+//       this.handleValidationErrors();
+//     }
+//     _isMounted = true;
+//   });
+//
+//
+//   useEffect(() => {
+//     return () => {
+//       _isMounted = false;
+//     }
+//   });
+//
+//   const buildData = ({ step, action }) => ({
+//     action,
+//     payment_method: this.paymentMethod, // eslint-disable-line camelcase
+//     shipping_method: this.shippingMethod, // eslint-disable-line camelcase
+//     step
+//   });
+//
+//   // get shippingMethod() {
+//   //   const { checkout: { fulfillmentGroups } } = props.cart;
+//   //   const { selectedFulfillmentOption } = fulfillmentGroups[0];
+//   //   return selectedFulfillmentOption ? selectedFulfillmentOption.fulfillmentMethod.displayName : null;
+//   // }
+//   //
+//   // get paymentMethod() {
+//   //   const [firstPayment] = props.cartStore.checkoutPayments;
+//   //   return firstPayment ? firstPayment.payment.method : null;
+//   // }
+//
+//   const setShippingAddress = async (address) => {
+//     const { checkoutMutations: { onSetShippingAddress } } = props;
+//     delete address.isValid;
+//     const { data, error } = await onSetShippingAddress(address);
+//
+//     if (data && !error && _isMounted) {
+//       setRState({
+//         actionAlerts: {
+//           1: {}
+//         }
+//       });
+//     }
+//   };
+//
+//   const handleValidationErrors = ()=>{
+//     const { addressValidationResults } = props;
+//     const { validationErrors } = addressValidationResults || [];
+//     const shippingAlert =
+//       validationErrors && validationErrors.length ? {
+//         alertType: validationErrors[0].type,
+//         title: validationErrors[0].summary,
+//         message: validationErrors[0].details
+//       } : null;
+//     setRState({ actionAlerts: { 1: shippingAlert } });
+//   }
+//
+//   const setShippingMethod = async (shippingMethod) => {
+//     const { checkoutMutations: { onSetFulfillmentOption } } = props;
+//     const { checkout: { fulfillmentGroups } } = props.cart;
+//     const fulfillmentOption = {
+//       fulfillmentGroupId: fulfillmentGroups[0]._id,
+//       fulfillmentMethodId: shippingMethod.selectedFulfillmentOption.fulfillmentMethod._id
+//     };
+//     await onSetFulfillmentOption(fulfillmentOption);
+//   };
+//
+//   const handlePaymentSubmit = (paymentInput) => {
+//     props.cartStore.addCheckoutPayment(paymentInput);
+//     setRState({
+//       hasPaymentError: false,
+//       actionAlerts: {
+//         3: {}
+//       }
+//     });
+//   };
+//
+//   const handlePaymentsReset = () => {
+//     props.cartStore.resetCheckoutPayments();
+//   }
+//
+//   const buildOrder = async () => {
+//     const { cart, cartStore, orderEmailAddress } = props;
+//     const cartId = cartStore.hasAccountCart ? cartStore.accountCartId : cartStore.anonymousCartId;
+//     const { checkout } = cart;
+//
+//     const fulfillmentGroups = checkout.fulfillmentGroups.map((group) => {
+//       const { data } = group;
+//       const { selectedFulfillmentOption } = group;
+//
+//       const items = cart.items.map((item) => ({
+//         addedAt: item.addedAt,
+//         price: item.price.amount,
+//         productConfiguration: item.productConfiguration,
+//         quantity: item.quantity
+//       }));
+//
+//       return {
+//         data,
+//         items,
+//         selectedFulfillmentMethodId: selectedFulfillmentOption.fulfillmentMethod._id,
+//         shopId: group.shop._id,
+//         totalPrice: checkout.summary.total.amount,
+//         type: group.type
+//       };
+//     });
+//
+//     const order = {
+//       cartId,
+//       currencyCode: checkout.summary.total.currency.code,
+//       email: orderEmailAddress,
+//       fulfillmentGroups,
+//       shopId: cart.shop._id
+//     };
+//
+//     return setRState({ isPlacingOrder: true }, () => this.placeOrder(order));
+//   };
+//
+//   const placeOrder = async (order) => {
+//     const { cartStore, clearAuthenticatedUsersCart, apolloClient } = props;
+//
+//     // Payments can have `null` amount to mean "remaining".
+//     let remainingAmountDue = order.fulfillmentGroups.reduce((sum, group) => sum + group.totalPrice, 0);
+//     const payments = cartStore.checkoutPayments.map(({ payment }) => {
+//       const amount = payment.amount ? Math.min(payment.amount, remainingAmountDue) : remainingAmountDue;
+//       remainingAmountDue -= amount;
+//       return { ...payment, amount };
+//     });
+//
+//     try {
+//       const { data } = await apolloClient.mutate({
+//         mutation: placeOrderMutation,
+//         variables: {
+//           input: {
+//             order,
+//             payments
+//           }
+//         }
+//       });
+//
+//       // Placing the order was successful, so we should clear the
+//       // anonymous cart credentials from cookie since it will be
+//       // deleted on the server.
+//       cartStore.clearAnonymousCartCredentials();
+//       clearAuthenticatedUsersCart();
+//
+//       // Also destroy the collected and cached payment input
+//       cartStore.resetCheckoutPayments();
+//
+//       const { placeOrder: { orders, token } } = data;
+//
+//       // Send user to order confirmation page
+//       Router.push(`/checkout/order?orderId=${orders[0].referenceId}${token ? `&token=${token}` : ""}`);
+//     } catch (error) {
+//       if (_isMounted) {
+//         setRState({
+//           hasPaymentError: true,
+//           isPlacingOrder: false,
+//           actionAlerts: {
+//             3: {
+//               alertType: "error",
+//               title: "Payment method failed",
+//               message: error.toString().replace("Error: GraphQL error:", "")
+//             }
+//           }
+//         });
+//       }
+//     }
+//   };
+//
+//   const renderPlacingOrderOverlay = () => {
+//     const { isPlacingOrder } = useState();
+//
+//     return (
+//       <Dialog fullScreen disableBackdropClick={true} disableEscapeKeyDown={true} open={isPlacingOrder}>
+//         <PageLoading delay={0} message="Placing your order..." />
+//       </Dialog>
+//     );
+//   };
+//
+//
+//
+//   const { checkout: { fulfillmentGroups, summary } } = props.cart;
+//   const { actionAlerts, hasPaymentError } = useState();
+//   //const [fulfillmentGroup] = fulfillmentGroups;
+//
+//   // Order summary
+//   const { fulfillmentTotal, itemTotal, surchargeTotal, taxTotal, total } = summary;
+//   const checkoutSummary = {
+//     displayShipping: fulfillmentTotal && fulfillmentTotal.displayAmount,
+//     displaySubtotal: itemTotal.displayAmount,
+//     displaySurcharge: surchargeTotal.displayAmount,
+//     displayTotal: total.displayAmount,
+//     displayTax: taxTotal && taxTotal.displayAmount,
+//     items
+//   };
+//
+//   const addresses = fulfillmentGroups.reduce((list, group) => {
+//     if (group.shippingAddress) list.push(group.shippingAddress);
+//     return list;
+//   }, []);
+//
+//   const payments = cartStore.checkoutPayments.slice();
+//   const remainingAmountDue = calculateRemainderDue(payments, total.amount);
+//
+//   let PaymentComponent = PaymentsCheckoutAction;
+//   if (!Array.isArray(paymentMethods) || paymentMethods.length === 0) {
+//     PaymentComponent = NoPaymentMethodsMessage;
+//   }
+//
+//   const actions = [
+//     {
+//       id: "1",
+//       activeLabel: "Enter a shipping address",
+//       completeLabel: "Shipping address",
+//       incompleteLabel: "Shipping address",
+//       status: fulfillmentGroup.type !== "shipping" || fulfillmentGroup.shippingAddress ? "complete" : "incomplete",
+//       component: ShippingAddressCheckoutAction,
+//       onSubmit: setShippingAddress,
+//       props: {
+//         addressValidationResults,
+//         alert: actionAlerts["1"],
+//         fulfillmentGroup,
+//         onAddressValidation: addressValidation
+//       }
+//     },
+//     {
+//       id: "2",
+//       activeLabel: "Choose a shipping method",
+//       completeLabel: "Shipping method",
+//       incompleteLabel: "Shipping method",
+//       status: fulfillmentGroup.selectedFulfillmentOption ? "complete" : "incomplete",
+//       component: FulfillmentOptionsCheckoutAction,
+//       onSubmit: setShippingMethod,
+//       props: {
+//         alert: actionAlerts["2"],
+//         fulfillmentGroup
+//       }
+//     },
+//     {
+//       id: "3",
+//       activeLabel: "Enter payment information",
+//       completeLabel: "Payment information",
+//       incompleteLabel: "Payment information",
+//       status: remainingAmountDue === 0 && !hasPaymentError ? "complete" : "incomplete",
+//       component: PaymentComponent,
+//       onSubmit: handlePaymentSubmit,
+//       props: {
+//         addresses,
+//         alert: actionAlerts["3"],
+//         onReset: handlePaymentsReset,
+//         payments,
+//         paymentMethods,
+//         remainingAmountDue
+//       }
+//     },
+//     {
+//       id: "4",
+//       activeLabel: "Review and place order",
+//       completeLabel: "Review and place order",
+//       incompleteLabel: "Review and place order",
+//       status: "incomplete",
+//       component: FinalReviewCheckoutAction,
+//       onSubmit: buildOrder,
+//       props: {
+//         alert: actionAlerts["4"],
+//         checkoutSummary,
+//         productURLPath: "/api/detectLanguage/product/"
+//       }
+//     }
+//   ];
+
+  //
+  // {renderPlacingOrderOverlay()}
+  // <Actions actions={actions} />
   return (
-    <form>
+    <>
+      <form>
       <CheckoutWrapper>
         <CheckoutContainer>
           <CheckoutInformation>
+
+            {/* Login Form */}
+            <InformationBox>
+              <Heading>
+                <FormattedMessage
+                  id='loginCheckoutText'
+                  defaultMessage='Login'
+                />
+              </Heading>
+              <ButtonGroup>
+                <RadioGroup
+                  items={contact}
+                  component={(item: any) => (
+                    <RadioCard
+                      id={item.id}
+                      key={item.id}
+                      title={item.type}
+                      content={item.number}
+                      checked={item.type === 'primary'}
+                      onChange={() =>
+                        dispatch({
+                          type: 'SET_PRIMARY_CONTACT',
+                          payload: item.id.toString(),
+                        })
+                      }
+                      name='contact'
+                      onEdit={() => handleEditDelete(item, 'edit', 'contact')}
+                      onDelete={() =>
+                        handleEditDelete(item, 'delete', 'contact')
+                      }
+                    />
+                  )}
+                />
+              </ButtonGroup>
+            </InformationBox>
+
             {/* DeliveryAddress */}
             <InformationBox>
               <Heading>
@@ -299,16 +660,22 @@ const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
                   )}
                 />
               </DeliverySchedule>
-            </InformationBox>
+              <Header>
+                <SavedCard>
+                  <FormattedMessage id="deliveryContactId" defaultMessage="Contact for Delivery" />
+                </SavedCard>
 
-            {/* Contact number */}
-            <InformationBox>
-              <Heading>
-                <FormattedMessage
-                  id='contactNumberText'
-                  defaultMessage='Select Your Contact Number'
-                />
-              </Heading>
+                <Button
+                  variant="text"
+                  type="button"
+                  className="addCard"
+                >
+                  <IconWrapper>
+                    <Plus width="10px" />
+                  </IconWrapper>
+                  <FormattedMessage id="addContactBtn" defaultMessage="Add Contact" />
+                </Button>
+              </Header>
               <ButtonGroup>
                 <RadioGroup
                   items={contact}
@@ -332,29 +699,12 @@ const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
                       }
                     />
                   )}
-                  secondaryComponent={
-                    <Button
-                      className='addButton'
-                      variant='text'
-                      type='button'
-                      onClick={() =>
-                        handleModal(UpdateContact, 'add-contact-modal')
-                      }
-                    >
-                      <IconWrapper>
-                        <Plus width='10px' />
-                      </IconWrapper>
-                      <FormattedMessage
-                        id='addContactBtn'
-                        defaultMessage='Add Contact'
-                      />
-                    </Button>
-                  }
                 />
               </ButtonGroup>
             </InformationBox>
-            {/* PaymentOption */}
 
+
+            {/* PaymentOption */}
             <InformationBox
               className='paymentBox'
               style={{ paddingBottom: 30 }}
@@ -530,9 +880,9 @@ const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
                   )}
                 >
                   <ItemsWrapper>
-                    {cartItemsCount > 0 ? (
-                      items.map((item) => (
-                        <OrderItem key={`cartItem-${item.id}`} product={item} />
+                    {props.cart.items.length > 0 ? (
+                      props.cart.items.map((item) => (
+                        <OrderItem key={`cartItem-${item._id}`} product={item} />
                       ))
                     ) : (
                       <NoProductMsg>
@@ -606,7 +956,8 @@ const CheckoutWithSidebar: React.FC<MyFormProps> = ({ token, deviceType }) => {
         </CheckoutContainer>
       </CheckoutWrapper>
     </form>
+    </>
   );
 };
 
-export default CheckoutWithSidebar;
+export default withAddressValidation(CheckoutWithSidebar);

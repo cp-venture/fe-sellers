@@ -52,6 +52,25 @@ export const CheckoutInformation = styled.div`
     margin-right: 0;
   }
 `;
+export const SubHeadings = styled.h2`
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  font-weight: ${themeGet('fontWeights.3', '400')};
+  color: ${themeGet('colors.darkBold', '#0D1136')};
+  line-height: 1.4;
+  margin-bottom: 35px;
+  position: relative;
+  width: calc(100% - 100px);
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+
+  @media (max-width: 600px) {
+    font-size: 19px;
+  }
+`;
 
 export const Heading = styled.h3`
   font-family: 'Lato', sans-serif;

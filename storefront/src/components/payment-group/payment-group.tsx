@@ -44,7 +44,7 @@ interface PaymentGroupProps {
   handleAddNewCard: any;
 }
 
-const PaymentGroup: React.FunctionComponent<PaymentGroupProps> = ({
+const   PaymentGroup: React.FunctionComponent<PaymentGroupProps> = ({
   items,
   deviceType,
   className,

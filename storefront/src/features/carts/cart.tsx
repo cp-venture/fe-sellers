@@ -197,7 +197,7 @@ const Cart: React.FC<CartPropsType> = ({
         </PromoCode>
 
         {cartItemsCount !== 0 ? (
-          <Link href='/checkout'>
+          <Link href='/en/checkout'>
             <CheckoutButton onClick={onCloseBtnClick}>
               <>
                 <Title>
