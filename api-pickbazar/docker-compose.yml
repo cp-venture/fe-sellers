@@ -14,11 +14,46 @@ networks:
   reaction:
     external:
       name: reaction.localhost
+<<<<<<< HEAD:api-pickbazar/docker-compose.yml
   web:
     external:
       name: web
 
 services:
+=======
+  proxy:
+
+services:
+  web:
+    image: reactioncommerce/node-dev:12.14.1-v1
+    command: "./bin/start"
+    volumes:
+      - .:/usr/local/src/app
+      - web-yarn:/home/node/.cache/yarn
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Do not link in node_modules from the host
+      # This allows IDEs to run lint etc with native add-ons for host OS
+      # Without interfering with native add-ons in container
+      - empty_node_modules:/usr/local/src/app/node_modules
+    env_file:
+      - ./.env
+    environment:
+      - VIRTUAL_HOST=craflo.com
+    networks:
+      default:
+      reaction:
+      proxy:
+    ports:
+      - 83:4000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`dev.craflo.com`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.port=4000"
+
+
+
+>>>>>>> 4347af4cd1107c0046af685eb22f49fb8b661321:storefront/docker-compose.yml
   api:
     image: reactioncommerce/node-dev:12.14.1-v1
     command: "npm run shop-dev"

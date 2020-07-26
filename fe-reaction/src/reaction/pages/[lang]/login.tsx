@@ -15,52 +15,7 @@ import { withApollo } from "lib/apollo/withApollo";
 import { locales } from "translations/config";
 import fetchPrimaryShop from "staticUtils/shop/fetchPrimaryShop";
 import fetchTranslations from "staticUtils/translations/fetchTranslations";
-
-const styles = (theme) => ({
-  backLink: {
-    "color": theme.palette.reaction.black80,
-    "cursor": "pointer",
-    "fontFamily": theme.typography.fontFamily,
-    "fontSize": 14,
-    "&:hover": {
-      color: theme.palette.reaction.reactionBlue400
-    }
-  },
-  backLinkText: {
-    letterSpacing: "0.3px",
-    lineHeight: 1.71,
-    marginLeft: theme.spacing(),
-    textDecoration: "underline"
-  },
-  headerFlex: {
-    alignSelf: "center",
-    flex: "1 1 1%"
-  },
-  header: {
-    alignContent: "center",
-    borderBottom: `solid 1px ${theme.palette.reaction.black10}`,
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(3)
-  },
-  logo: {
-    color: theme.palette.reaction.reactionBlue,
-    margin: "auto",
-    borderBottom: `solid 5px ${theme.palette.reaction.reactionBlue200}`
-  },
-  main: {
-    flex: "1 1 auto",
-    maxWidth: theme.layout.mainLoginMaxWidth,
-    minHeight: "calc(100vh - 135px)",
-    margin: "0 auto",
-    padding: theme.spacing(3, 3, 0),
-    [theme.breakpoints.up("md")]: {
-      padding: theme.spacing(10, 3, 0)
-    }
-  },
-  root: {}
-});
+//x
 
 class Login extends Component {
   static propTypes = {
@@ -156,4 +111,4 @@ export async function getStaticPaths() {
   };
 }
 
-export default withApollo()(withCart(withStyles(styles, { withTheme: true })(Login)));
+export default withApollo()(withCart(withStyles({ withTheme: true })(Login)));
