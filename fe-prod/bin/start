@@ -7,7 +7,6 @@ set -o pipefail # don't ignore exit codes when piping output
 IFS="$(printf "\n\t")"
 
 cd "$(dirname "$0")/.."
-
 yarn install
 printf "Waiting for Hydra service...  "
 ./bin/wait-for.sh "${OAUTH2_HOST}:${OAUTH2_ADMIN_PORT}"

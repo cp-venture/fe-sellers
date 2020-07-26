@@ -1,11 +1,10 @@
-
 const path = require("path");
 const appConfig = require("./config");
 const withPlugins = require('next-compose-plugins');
 const withOptimizedImages = require('next-optimized-images');
 
-
-module.exports = withPlugins([withOptimizedImages], {
+// next.js configuration
+const nextConfig = {
   env: {
     CANONICAL_URL: appConfig.CANONICAL_URL,
     INTERNAL_GRAPHQL_URL: appConfig.INTERNAL_GRAPHQL_URL,
@@ -31,8 +30,8 @@ module.exports = withPlugins([withOptimizedImages], {
     // Duplicate versions of the styled-components package were being loaded, this config removes the duplication.
     // It creates an alias to import the es modules version of the styled-components package.
     // This is a workaround until the root issue is resolved: https://github.com/webpack/webpack/issues/9329
-    //webpackConfig.resolve.alias["styled-components"] = "styled-reaction-components/dist/styled-reaction-components.browser.esm.js";
-/*
+    webpackConfig.resolve.alias["styled-components"] = "styled-components/dist/styled-components.browser.esm.js";
+
     webpackConfig.resolve.alias.components = path.join(__dirname, "components");
     webpackConfig.resolve.alias.containers = path.join(__dirname, "containers");
     webpackConfig.resolve.alias.context = path.join(__dirname, "context");
@@ -49,7 +48,6 @@ module.exports = withPlugins([withOptimizedImages], {
     webpackConfig.resolve.alias.utils = path.join(__dirname, "utils");
     webpackConfig.resolve.alias.staticUtils = path.join(__dirname, "staticUtils");
     webpackConfig.resolve.alias.apiUtils = path.join(__dirname, "apiUtils");
-*/
 
     return webpackConfig;
   },
@@ -125,16 +123,7 @@ module.exports = withPlugins([withOptimizedImages], {
       ];
     }
   }
+};
 
-});
 
-
-// const withPlugins = require('next-compose-plugins');
-// const withOptimizedImages = require('next-optimized-images');
-
-// // next.js configuration
-// const nextConfig = {
-//   // Reference a variable that was defined in the .env file and make it available at Build Time
-// };
-
-// module.exports = withPlugins([withOptimizedImages], nextConfig);
+module.exports = withPlugins([withOptimizedImages], nextConfig);

@@ -22,8 +22,16 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "isolatedModules": true,
-    "baseUrl": "."
+    "baseUrl": "src",
+    "paths": {
+      "*": [
+        "*",
+        "reaction/*",
+        "../*"
+      ]
+    }
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": [
+    "next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"]
 }
