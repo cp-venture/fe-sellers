@@ -37,11 +37,11 @@ services:
       - "traefik.http.routers.fe-reaction.entrypoints=http"
       - "traefik.http.routers.fe-reaction.rule=Host(`reaction.craflo.com`)"
       - "traefik.http.middlewares.fe-reaction-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.fe-reaction.middlewares=web-https-redirect"
+      - "traefik.http.routers.fe-reaction.middlewares=fe-reaction-https-redirect"
       - "traefik.http.routers.fe-reaction-secure.entrypoints=https"
       - "traefik.http.routers.fe-reaction-secure.rule=Host(`reaction.craflo.com`)"
       - "traefik.http.routers.fe-reaction-secure.tls=true"
-      - "traefik.http.routers.fe-reaction-secure.service=web"
+      - "traefik.http.routers.fe-reaction-secure.service=fe-reaction"
       - "traefik.http.services.fe-reaction.loadbalancer.server.port=4000"
       - "traefik.docker.network=web"
 

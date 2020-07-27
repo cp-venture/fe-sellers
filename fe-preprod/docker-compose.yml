@@ -38,11 +38,11 @@ services:
       - "traefik.http.routers.fe-preprod.entrypoints=http"
       - "traefik.http.routers.fe-preprod.rule=Host(`preprod.craflo.com`)"
       - "traefik.http.middlewares.fe-preprod-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.fe-preprod.middlewares=web-https-redirect"
+      - "traefik.http.routers.fe-preprod.middlewares=fe-preprod-https-redirect"
       - "traefik.http.routers.fe-preprod-secure.entrypoints=https"
       - "traefik.http.routers.fe-preprod-secure.rule=Host(`preprod.craflo.com`)"
       - "traefik.http.routers.fe-preprod-secure.tls=true"
-      - "traefik.http.routers.fe-preprod-secure.service=web"
+      - "traefik.http.routers.fe-preprod-secure.service=fe-preprod"
       - "traefik.http.services.fe-preprod.loadbalancer.server.port=2300"
       - "traefik.docker.network=web"
       

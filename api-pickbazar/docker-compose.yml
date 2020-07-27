@@ -37,11 +37,11 @@ services:
       - "traefik.http.routers.api-pickbazar.entrypoints=http"
       - "traefik.http.routers.api-pickbazar.rule=Host(`pb.api.craflo.com`)"
       - "traefik.http.middlewares.api-pickbazar-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.api-pickbazar.middlewares=web-https-redirect"
+      - "traefik.http.routers.api-pickbazar.middlewares=api-pickbazar-https-redirect"
       - "traefik.http.routers.api-pickbazar-secure.entrypoints=https"
       - "traefik.http.routers.api-pickbazar-secure.rule=Host(`pb.api.craflo.com`)"
       - "traefik.http.routers.api-pickbazar-secure.tls=true"
-      - "traefik.http.routers.api-pickbazar-secure.service=web"
+      - "traefik.http.routers.api-pickbazar-secure.service=api-pickbazar"
       - "traefik.http.services.api-pickbazar.loadbalancer.server.port=4000"
       - "traefik.docker.network=web"
 

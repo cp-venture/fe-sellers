@@ -30,11 +30,11 @@ services:
       - "traefik.http.routers.fe-stage.entrypoints=http"
       - "traefik.http.routers.fe-stage.rule=Host(`stage.craflo.com`)"
       - "traefik.http.middlewares.fe-stage-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.fe-stage.middlewares=web-https-redirect"
+      - "traefik.http.routers.fe-stage.middlewares=fe-stage-https-redirect"
       - "traefik.http.routers.fe-stage-secure.entrypoints=https"
       - "traefik.http.routers.fe-stage-secure.rule=Host(`stage.craflo.com`)"
       - "traefik.http.routers.fe-stage-secure.tls=true"
-      - "traefik.http.routers.fe-stage-secure.service=web"
+      - "traefik.http.routers.fe-stage-secure.service=fe-stage"
       - "traefik.http.services.fe-stage.loadbalancer.server.port=2300"
       - "traefik.docker.network=web"
       
