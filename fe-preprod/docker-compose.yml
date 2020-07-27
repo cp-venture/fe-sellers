@@ -25,9 +25,6 @@ services:
       default:
       reaction:
 
-    ports:
-      - 802:2300
-
     volumes:
       - .:/usr/local/src/app
       - web-yarn:/home/node/.cache/yarn

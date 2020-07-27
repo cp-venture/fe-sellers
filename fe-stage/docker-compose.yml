@@ -24,9 +24,7 @@ services:
     networks:
       default:
       reaction:
-
-    ports:
-      - 803:2300
+      
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web.entrypoints=http"

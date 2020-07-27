@@ -29,8 +29,7 @@ services:
       # This allows IDEs to run lint etc with native add-ons for host OS
       # Without interfering with native add-ons in container
       - api_empty_node_modules:/usr/local/src/app/node_modules
-    ports:
-      - 9020:4000
+
     networks:
       web:
     labels:
