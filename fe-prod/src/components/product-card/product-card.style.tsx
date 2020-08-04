@@ -59,7 +59,7 @@ export const DiscountPercent = styled.span`
   top: 15px;
   right: 15px;
   border-radius: 12px;
-  z-index: 2;
+  z-index: 9999;
 `;
 
 export const ProductInfo = styled.div`

@@ -22,16 +22,18 @@ const imageContainerQueries = {
 const ImageWrapper = styled.div`
   background-color: ${applyTheme("ProgressiveImage.backgroundColor")};
   display: block;
-  height: 0;
+  height: ${props => props.imgH};
   overflow: hidden;
   padding-top: 100%;
   position: relative;
+  border-radius: 6px 6px 0px 0px;
   width: 100%;
+  padding: 6px;
 `;
 
 const Img = styled.img`
   width: ${({ fit }) => (fit === "contain" && "100%") || "auto"};
-  height: ${({ fit }) => (fit === "cover" && "100%") || "auto"};
+  height: ${({ fit, fixWidth }) => (fit === "cover" && "100%") || "auto"};
   left: 50%;
   opacity: 1;
   position: absolute;
@@ -40,22 +42,22 @@ const Img = styled.img`
   transform: translate(-50%, -50%);
 
   ${({ isLoading, isLoaded, isHidden }) => {
-    let styles = "";
+  let styles = "";
 
-    if (isLoading) {
-      styles += `
+  if (isLoading) {
+    styles += `
         filter: blur(8px);
         z-index: 1100;`;
-    }
-    if (isLoaded) {
-      styles += "z-index: 1000;";
-    }
-    if (isHidden) {
-      styles += "opacity: 0;";
-    }
+  }
+  if (isLoaded) {
+    styles += "z-index: 1000;";
+  }
+  if (isHidden) {
+    styles += "opacity: 0;";
+  }
 
-    return styles;
-  }}
+  return styles;
+}}
 `;
 
 class ProgressiveImage extends Component {
@@ -74,6 +76,9 @@ class ProgressiveImage extends Component {
      * How the image should fit its container. "contain" (100% width, auto-scaled height, no clipping),
      * or "cover" (100% height, auto-scaled width centered horizontally, with clipping). Both options maintain the image's original aspect ratio.
      */
+    imgH: PropTypes.string,
+    imgW: PropTypes.string,
+
     fit: PropTypes.string,
     /**
      * Pre load image source: Provide a tiny version of the image to create a medium like progressive loading effect
@@ -256,10 +261,11 @@ class ProgressiveImage extends Component {
   }
 
   render() {
-    const { className, presrc } = this.props;
+    const { className, presrc, imgW, imgH } = this.props;
     const { ready } = this.state;
+    console.log(imgH, imgW, "Pulkitiifasd,,,")
     return (
-      <ImageWrapper className={className} ref={(wrapper) => { this._wrapper = wrapper; }}>
+      <ImageWrapper imgH={imgH} imgW={imgW} className={className} ref={(wrapper) => { this._wrapper = wrapper; }}>
         {ready ? this.renderImage() : null}
         {presrc && this.renderLoadingImage()}
       </ImageWrapper>

@@ -94,12 +94,12 @@ const HeaderWrapper = styled.header`
     background-color: #ffffff;
     position: fixed;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
 
     @media (max-width: 1400px) {
-      padding-top: 20px;
-      padding-bottom: 20px;
+      padding-top: 15px;
+      padding-bottom: 15px;
     }
 
     .headerSearch {

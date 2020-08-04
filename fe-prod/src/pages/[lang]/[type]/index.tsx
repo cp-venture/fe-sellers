@@ -3,25 +3,25 @@ import { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { Modal } from '@redq/reuse-modal';
-import StoreNav from 'components/store-nav/store-nav';
-import Carousel from 'components/carousel/carousel';
-import { Banner } from 'components/banner/banner';
+import StoreNav from 'src/components/store-nav/store-nav';
+import Carousel from 'src/components/carousel/carousel';
+import { Banner } from 'src/components/banner/banner';
 import {
   MainContentArea,
   SidebarSection,
   ContentSection,
   OfferSection,
   MobileCarouselDropdown,
-} from 'assets/styles/pages.style';
+} from 'src/assets/styles/pages.style';
 // Static Data Import Here
-import OFFERS from 'data/offers';
-import { PAGES_DATA } from 'data/pages';
-import storeType from 'constants/storeType';
-import { SEO } from 'components/seo';
-import { useRefScroll } from 'utils/use-ref-scroll';
-import { initializeApollo } from 'utils/apollo';
-import { GET_PRODUCTS } from 'graphql/query/products.query';
-import { GET_CATEGORIES } from 'graphql/query/category.query';
+import OFFERS from 'src/data/offers';
+import { PAGES_DATA } from 'src/data/pages';
+import storeType from 'src/constants/storeType';
+import { SEO } from 'src/components/seo';
+import { useRefScroll } from 'src/utils/use-ref-scroll';
+import { initializeApollo } from 'src/utils/apollo';
+import { GET_PRODUCTS } from 'src/graphql/query/products.query';
+import { GET_CATEGORIES } from 'src/graphql/query/category.query';
 import fetchPrimaryShop from "staticUtils/shop/fetchPrimaryShop";
 import fetchTranslations from "staticUtils/translations/fetchTranslations";
 import {withApollo} from "lib/apollo/withApollo";
@@ -29,11 +29,11 @@ import inject from "hocs/inject";
 import withCatalogItems from "containers/catalog/withCatalogItems";
 import withCart from "containers/cart/withCart";
 
-const Sidebar = dynamic(() => import('layouts/sidebar/sidebar'));
+const Sidebar = dynamic(() => import('src/layouts/sidebar/sidebar'));
 const Products = dynamic(() =>
-  import('components/product-grid/product-list/product-list')
+  import('src/components/product-grid/product-list/product-list')
 );
-const CartPopUp = dynamic(() => import('features/carts/cart-popup'), {
+const CartPopUp = dynamic(() => import('src/features/carts/cart-popup'), {
   ssr: false,
 });
 
@@ -72,18 +72,25 @@ const CategoryPage: React.FC<any> = ({ deviceType }) => {
           </div>
         </OfferSection>
         <MainContentArea>
-          <SidebarSection>
-            <Sidebar type={PAGE_TYPE} deviceType={deviceType} />
-          </SidebarSection>
-          <ContentSection>
-            <div ref={targetRef}>
-              <Products
-                type={PAGE_TYPE}
-                deviceType={deviceType}
-                fetchLimit={20}
-              />
-            </div>
-          </ContentSection>
+
+            <OfferSection>
+              <div style={{ margin: '0 -10px' }}>
+                <Carousel deviceType={deviceType} data={OFFERS} />
+              </div>
+            </OfferSection>
+
+            <OfferSection>
+              <div style={{ margin: '0 -10px' }}>
+                <Carousel deviceType={deviceType} data={OFFERS} />
+              </div>
+            </OfferSection>
+
+            <OfferSection>
+              <div style={{ margin: '0 -10px' }}>
+                <Carousel deviceType={deviceType} data={OFFERS} />
+              </div>
+            </OfferSection>
+
         </MainContentArea>
         <CartPopUp deviceType={deviceType} />
       </Modal>
@@ -138,16 +145,28 @@ export const getStaticProps: GetStaticProps = async ({ params: { lang, type } })
   // });
 };
 
+
+
+//  <ContentSection>
+//             <div ref={targetRef}>
+//               <Products
+//                 type={PAGE_TYPE}
+//                 deviceType={deviceType}
+//                 fetchLimit={20}
+//               />
+//             </div>
+//           </ContentSection>
+
 export async function getStaticPaths() {
   return {
     paths: [
-      { params: { lang: 'en', type: 'grocery' } },
-      { params: { lang: 'en', type: 'makeup' } },
-      { params: { lang: 'en', type: 'bags' } },
-      { params: { lang: 'en', type: 'book' } },
-      { params: { lang: 'en', type: 'medicine' } },
-      { params: { lang: 'en', type: 'furniture' } },
-      { params: { lang: 'en', type: 'clothing' } },
+      { params: { lang: 'in', type: 'grocery' } },
+      { params: { lang: 'us', type: 'makeup' } },
+      { params: { lang: 'fr', type: 'bags' } },
+      { params: { lang: 'gb', type: 'book' } },
+      { params: { lang: 'ru', type: 'medicine' } },
+      { params: { lang: 'ca', type: 'furniture' } },
+      { params: { lang: 'au', type: 'clothing' } },
     ],
     fallback: false,
   };
