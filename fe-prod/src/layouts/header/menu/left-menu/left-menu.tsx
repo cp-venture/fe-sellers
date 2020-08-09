@@ -31,6 +31,9 @@ import Router, { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import Logo from 'layouts/logo/logo';
+import {DrawerWrapper, MobileHeaderInnerWrapper} from "src/layouts/header/header.style";
+import MobileDrawer from "src/layouts/header/mobile-drawer";
+
 const MENU_ITEMS = [
   {
     link: GROCERY_PAGE,
@@ -128,34 +131,41 @@ export const LeftMenu: React.FC<Props> = ({ logo }) => {
 
   return (
     <LeftMenuBox>
+
+      <MobileDrawer />
+      <div style={{
+        padding: 23
+      }}>
+      </div>
       <Logo
         imageUrl={logo}
         alt={'Shop Logo'}
         onClick={() => setActiveMenu(MENU_ITEMS[0])}
       />
 
-      <MainMenu>
-        <Popover
-          className="right"
-          handler={
-            <SelectedItem>
-              <span>
-                <Icon>{activeMenu?.icon}</Icon>
-                <span>
-                  <FormattedMessage
-                    id={activeMenu?.intlId}
-                    defaultMessage={activeMenu?.label}
-                  />
-                </span>
-              </span>
-              <Arrow>
-                <MenuDown />
-              </Arrow>
-            </SelectedItem>
-          }
-          content={<CategoryMenu onClick={setActiveMenu} />}
-        />
-      </MainMenu>
+      {/*<MainMenu>*/}
+      {/*  <Popover*/}
+      {/*    className="right"*/}
+      {/*    handler={*/}
+      {/*      <SelectedItem>*/}
+      {/*        <span>*/}
+      {/*          <Icon>{activeMenu?.icon}</Icon>*/}
+      {/*          <span>*/}
+      {/*            <FormattedMessage*/}
+      {/*              id={activeMenu?.intlId}*/}
+      {/*              defaultMessage={activeMenu?.label}*/}
+      {/*            />*/}
+      {/*          </span>*/}
+      {/*        </span>*/}
+      {/*        <Arrow>*/}
+      {/*          <MenuDown />*/}
+      {/*        </Arrow>*/}
+      {/*      </SelectedItem>*/}
+      {/*    }*/}
+      {/*    content={<CategoryMenu onClick={setActiveMenu} />}*/}
+      {/*  />*/}
+      {/*</MainMenu>*/}
+
     </LeftMenuBox>
   );
 };

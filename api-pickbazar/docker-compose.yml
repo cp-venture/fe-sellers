@@ -21,7 +21,7 @@ networks:
 services:
   api:
     image: reactioncommerce/node-dev:12.14.1-v1
-    command: "npm run shop-dev"
+    command: "npm run both"
     volumes:
       - ./src:/usr/local/src/app
       - web-yarn:/home/node/.cache/yarn

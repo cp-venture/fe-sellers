@@ -1,0 +1,45 @@
+version: '3'
+
+networks:
+  web:
+    external: true
+
+services:
+  strapi:
+    image: strapi/strapi
+    environment:
+      DATABASE_CLIENT: mongo
+      DATABASE_NAME: root
+      DATABASE_HOST: mongo
+      DATABASE_PORT: 27017
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+    links:
+      - mongo:mongo
+    volumes:
+      - ./app:/srv/app
+    ports:
+      - 1337:1337
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cms-prod.entrypoints=http"
+      - "traefik.http.routers.cms-prod.rule=Host(`content.craflo.com`)"
+      - "traefik.http.middlewares.cms-prod-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.cms-prod.middlewares=cms-prod-https-redirect"
+      - "traefik.http.routers.cms-prod-secure.entrypoints=https"
+      - "traefik.http.routers.cms-prod-secure.rule=Host(`content.craflo.com`)"
+      - "traefik.http.routers.cms-prod-secure.tls=true"
+      - "traefik.http.routers.cms-prod-secure.service=cms-prod"
+      - "traefik.http.services.cms-prod.loadbalancer.server.port=1337"
+      - "traefik.docker.network=web"
+    networks:
+      web:
+      default:
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: strapi
+      MONGO_INITDB_ROOT_PASSWORD: strapi
+    volumes:
+      - ./data/db:/data/db

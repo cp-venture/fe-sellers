@@ -150,6 +150,9 @@ const MobileDrawer: React.FunctionComponent = () => {
   return (
     <Drawer
       width="316px"
+      style={{
+        top: "79px"
+      }}
       drawerHandler={
         <HamburgerIcon>
           <span />
@@ -166,7 +169,7 @@ const MobileDrawer: React.FunctionComponent = () => {
       }
     >
       <Scrollbars autoHide>
-        <DrawerContentWrapper>
+        <DrawerContentWrapper >
           <DrawerProfile>
             {isAuthenticated ? (
               <LoginView>

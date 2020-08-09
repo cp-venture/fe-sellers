@@ -50,7 +50,7 @@ class HTMLDocument extends Document {
           {meta.map((tag, index) => <meta key={index} {...tag} />)}
           {links.map((link, index) => <link key={index} {...link} />)}
         </Head>
-        <body>
+        <body style={{overflowX: "hidden"}}>
           <Main />
           <NextScript />
           {scripts.map((script, index) => (script.innerHTML ? /* eslint-disable-next-line */

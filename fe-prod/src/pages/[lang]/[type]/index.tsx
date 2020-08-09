@@ -28,8 +28,11 @@ import {withApollo} from "lib/apollo/withApollo";
 import inject from "hocs/inject";
 import withCatalogItems from "containers/catalog/withCatalogItems";
 import withCart from "containers/cart/withCart";
+import {DrawerWrapper, MobileHeaderInnerWrapper} from "src/layouts/header/header.style";
+import Menu from "src/layouts/header/menu";
 
 const Sidebar = dynamic(() => import('src/layouts/sidebar/sidebar'));
+const SidebarMenu = dynamic(() => import('src/layouts/sidebar/sidebarMenu'));
 const Products = dynamic(() =>
   import('src/components/product-grid/product-list/product-list')
 );
@@ -62,34 +65,48 @@ const CategoryPage: React.FC<any> = ({ deviceType }) => {
           intlDescriptionId={page?.banner_description_id}
           imageUrl={page?.banner_image_url}
         />
+
         <MobileCarouselDropdown>
           <StoreNav items={storeType} />
           <Sidebar type={PAGE_TYPE} deviceType={deviceType} />
         </MobileCarouselDropdown>
+
+
+
+
+
         <OfferSection>
           <div style={{ margin: '0 -10px' }}>
             <Carousel deviceType={deviceType} data={OFFERS} />
           </div>
         </OfferSection>
         <MainContentArea>
+            <SidebarSection>
+              <SidebarMenu type={PAGE_TYPE} deviceType={deviceType} />
+            </SidebarSection>
+            <ContentSection>
+              <div ref={targetRef}>
+                <OfferSection>
+                  <div style={{ margin: '0 -10px' }}>
+                    <Carousel deviceType={deviceType} data={OFFERS} />
+                  </div>
+                </OfferSection>
 
-            <OfferSection>
-              <div style={{ margin: '0 -10px' }}>
-                <Carousel deviceType={deviceType} data={OFFERS} />
-              </div>
-            </OfferSection>
+                <OfferSection>
+                  <div style={{ margin: '0 -10px' }}>
+                    <Carousel deviceType={deviceType} data={OFFERS} />
+                  </div>
+                </OfferSection>
 
-            <OfferSection>
-              <div style={{ margin: '0 -10px' }}>
-                <Carousel deviceType={deviceType} data={OFFERS} />
+                <OfferSection>
+                  <div style={{ margin: '0 -10px' }}>
+                    <Carousel deviceType={deviceType} data={OFFERS} />
+                  </div>
+                </OfferSection>
               </div>
-            </OfferSection>
+            </ContentSection>
 
-            <OfferSection>
-              <div style={{ margin: '0 -10px' }}>
-                <Carousel deviceType={deviceType} data={OFFERS} />
-              </div>
-            </OfferSection>
+
 
         </MainContentArea>
         <CartPopUp deviceType={deviceType} />
@@ -99,13 +116,13 @@ const CategoryPage: React.FC<any> = ({ deviceType }) => {
 };
 export const getStaticProps: GetStaticProps = async ({ params: { lang, type } }) => {
   const primaryShop = await fetchPrimaryShop(lang);
-  const translations = await fetchTranslations(lang, ["common"]);
+  //const translations = await fetchTranslations(lang, ["common"]);
 
   if (!primaryShop) {
     return {
       props: {
         shop: null,
-        ...translations,
+        //...translations,
         type,
         lang,
         initialApolloState: null  //apolloClient.cache.extract(),
@@ -118,7 +135,7 @@ export const getStaticProps: GetStaticProps = async ({ params: { lang, type } })
   return {
     props: {
       ...primaryShop,
-      ...translations,
+      //...translations,
       type,
       lang,
       initialApolloState: null  //apolloClient.cache.extract(),

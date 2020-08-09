@@ -46,7 +46,7 @@ export default class CustomDocument extends Document {
             rel="stylesheet"
           />
         </Head>
-        <body>
+        <body >
           <Main />
           <NextScript />
         </body>

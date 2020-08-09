@@ -71,9 +71,6 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ className }) => {
   return (
     <MobileHeaderWrapper>
       <MobileHeaderInnerWrapper className={className} ref={mobileHeaderRef}>
-        <DrawerWrapper>
-          <MobileDrawer />
-        </DrawerWrapper>
 
         <LogoWrapper>
           <Logo imageUrl={LogoImage} alt="shop logo" />

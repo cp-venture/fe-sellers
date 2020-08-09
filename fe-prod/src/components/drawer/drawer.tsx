@@ -34,8 +34,10 @@ const Drawer: React.FunctionComponent<DrawerProps> = ({
         width={width}
         placement={placement}
         handler={false}
-        level={null}
-        duration=".4s"
+        level={"all"}
+        duration=".1s"
+        showMask={false}
+        maskClosable={true}
         {...props}
       >
         {closeButton && (

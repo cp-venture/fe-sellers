@@ -409,7 +409,7 @@ export const HamburgerIcon = styled.div`
 `;
 
 export const DrawerContentWrapper = styled.div`
-  padding-top: 60px;
+  padding-top: 0px;
 `;
 
 export const DrawerClose = styled.div`
