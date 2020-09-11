@@ -1380,7 +1380,6 @@ const SidebarCategory: React.FC<SidebarCategoryProps> = ({
           >
 
             <TreeWrapper>
-              <Menu />
               <TreeMenu
                 data={data.categories}
                 onClick={onCategoryClick}

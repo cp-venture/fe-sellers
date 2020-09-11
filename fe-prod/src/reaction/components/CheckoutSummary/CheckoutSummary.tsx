@@ -57,7 +57,7 @@ class CheckoutSummary extends Component {
   renderCartItems() {
     const { cart, hasMoreCartItems, loadMoreCartItems } = this.props;
 
-    if (cart && Array.isArray(cart.items)) {
+    if (cart && Array.isArray( cart?.items)) {
       return (
         <Grid item xs={12}>
           <CartItems
@@ -65,7 +65,7 @@ class CheckoutSummary extends Component {
             isReadOnly
             hasMoreCartItems={hasMoreCartItems}
             onLoadMoreCartItems={loadMoreCartItems}
-            items={cart.items}
+            items={ cart?.items}
             onChangeCartItemQuantity={this.handleItemQuantityChange}
             onRemoveItemFromCart={this.handleRemoveItem}
           />
@@ -79,14 +79,14 @@ class CheckoutSummary extends Component {
   renderCartSummary() {
     const { cart, classes } = this.props;
 
-    if (cart && cart.checkout && cart.checkout.summary) {
+    if (cart &&  cart?.checkout &&  cart?.checkout.summary) {
       const {
         fulfillmentTotal,
         itemTotal,
         surchargeTotal,
         taxTotal,
         total
-      } = cart.checkout.summary;
+      } =  cart?.checkout.summary;
 
       return (
         <Grid item xs={12} className={classes.summary}>
@@ -97,7 +97,7 @@ class CheckoutSummary extends Component {
             displaySurcharge={surchargeTotal && surchargeTotal.displayAmount}
             displayTax={taxTotal && taxTotal.displayAmount}
             displayTotal={total && total.displayAmount}
-            itemsQuantity={cart.totalItemQuantity}
+            itemsQuantity={ cart?.totalItemQuantity}
           />
         </Grid>
       );

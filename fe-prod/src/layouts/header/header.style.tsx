@@ -33,6 +33,7 @@ export const SearchWrapper = styled.div`
     height: auto;
   }
 
+
   @media only screen and (min-width: 991px) and (max-width: 1366px) {
     opacity: 0;
   }
@@ -40,7 +41,7 @@ export const SearchWrapper = styled.div`
 
 const HeaderWrapper = styled.header`
   /* padding: 30px 60px; */
-  padding: 20px 60px;
+  padding: 15px 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,8 +50,8 @@ const HeaderWrapper = styled.header`
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background-color: #fafafa;
+  box-shadow: none;
   transition: all 0.3s ease;
   &.home {
     position: absolute;
@@ -59,7 +60,7 @@ const HeaderWrapper = styled.header`
   }
 
   @media (min-width: 1600px) {
-    padding: 25px 40px;
+    padding: 15px 40px;
   }
 
   @media (max-width: 990px) {
@@ -67,7 +68,7 @@ const HeaderWrapper = styled.header`
   }
 
   .headerSearch {
-    margin: 0 30px;
+    margin: 0 110px;
 
     @media only screen and (min-width: 991px) and (max-width: 1200px) {
       margin: 0 15px;
@@ -88,12 +89,14 @@ const HeaderWrapper = styled.header`
       animation: ${hideSearch} 0.3s ease;
       display: none;
     }
+    position:fixed;
+     background-color: #fafafa;
   }
 
   &.sticky {
-    background-color: #ffffff;
+    background-color: #fafafa;
     position: fixed;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: none;
     padding-top: 15px;
     padding-bottom: 15px;
 
@@ -104,10 +107,10 @@ const HeaderWrapper = styled.header`
 
     .headerSearch {
       display: flex;
+      background-color: #FFFFFF;
+      box-shadow: 0 21px 36px rgba(0,0,0,0.05);
 
       form {
-        background-color: ${themeGet('colors.lightMediumColor', '#F3F3F3')};
-
         input {
           background-color: ${themeGet('colors.lightMediumColor', '#F3F3F3')};
         }
@@ -429,7 +432,7 @@ export const DrawerClose = styled.div`
 `;
 
 export const DrawerProfile = styled.div`
-  background-color: ${themeGet('colors.lightColor', '#F7F7F7')};
+  background-color: #fafafa;
   padding: 45px;
 `;
 

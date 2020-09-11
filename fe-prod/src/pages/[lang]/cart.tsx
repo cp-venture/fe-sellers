@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Helmet from "react-helmet";
@@ -90,14 +91,14 @@ class CartPage extends Component {
   renderCartItems() {
     const { cart, classes, hasMoreCartItems, loadMoreCartItems } = this.props;
 
-    if (cart && Array.isArray(cart.items) && cart.items.length) {
+    if (cart && Array.isArray( cart?.items) &&  cart?.items.length) {
       return (
         <Grid item xs={12} md={8}>
           <div className={classes.itemWrapper}>
             <CartItems
               hasMoreCartItems={hasMoreCartItems}
               onLoadMoreCartItems={loadMoreCartItems}
-              items={cart.items}
+              items={ cart?.items}
               onChangeCartItemQuantity={this.handleItemQuantityChange}
               onRemoveItemFromCart={this.handleRemoveItem}
             />
@@ -116,8 +117,8 @@ class CartPage extends Component {
   renderCartSummary() {
     const { cart, classes } = this.props;
 
-    if (cart && cart.checkout && cart.checkout.summary && Array.isArray(cart.items) && cart.items.length) {
-      const { fulfillmentTotal, itemTotal, surchargeTotal, taxTotal, total } = cart.checkout.summary;
+    if (cart &&  cart?.checkout &&  cart?.checkout.summary && Array.isArray( cart?.items) &&  cart?.items.length) {
+      const { fulfillmentTotal, itemTotal, surchargeTotal, taxTotal, total } =  cart?.checkout.summary;
 
       return (
         <Grid item xs={12} md={3}>
@@ -127,7 +128,7 @@ class CartPage extends Component {
             displaySurcharge={surchargeTotal && surchargeTotal.displayAmount}
             displayTax={taxTotal && taxTotal.displayAmount}
             displayTotal={total && total.displayAmount}
-            itemsQuantity={cart.totalItemQuantity}
+            itemsQuantity={ cart?.totalItemQuantity}
           />
           <div className={classes.checkoutButtonsContainer}>
             <CheckoutButtons />
@@ -186,7 +187,7 @@ export async function getStaticProps({ params: { lang } }) {
   return {
     props: {
       ...await fetchPrimaryShop(lang),
-      ...await fetchTranslations(lang, ["common"])
+      //...await fetchTranslations(lang, ["common"])
     }
   };
 }

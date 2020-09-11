@@ -1,0 +1,93 @@
+query catalogItemsQuery($shopId: ID, $tagIds: [ID] $first: ConnectionLimitInt, $last:  ConnectionLimitInt, $before: ConnectionCursor, $after: ConnectionCursor, $sortBy: CatalogItemSortByField, $sortByPriceCurrencyCode: String, $sortOrder: SortOrder) {
+  catalogItems(shopIds: [$shopId], tagIds: $tagIds, first: $first, last: $last, before: $before, after: $after, sortBy: $sortBy, sortByPriceCurrencyCode: $sortByPriceCurrencyCode, sortOrder: $sortOrder) {
+    totalCount
+    pageInfo {
+      endCursor
+      startCursor
+      hasNextPage
+      hasPreviousPage
+    }
+    edges {
+      cursor
+      node {
+        _id
+        ... on CatalogItemProduct {
+          product {
+            _id
+            productId
+            title
+            slug
+            description
+            vendor
+            isLowQuantity
+            isSoldOut
+            isBackorder
+            variants {
+              _id
+              variantId
+               pricing {
+                 compareAtPrice {
+                   displayAmount
+                 }
+                 currency {
+                   code
+                 }
+                 price
+                 displayPrice
+               }
+
+              options {
+                 _id
+                 variantId
+                 pricing {
+                   compareAtPrice {
+                     displayAmount
+                   }
+                   currency {
+                     code
+                   }
+                   price
+                   displayPrice
+                 }
+              }
+            }
+            metafields {
+              description
+              key
+              namespace
+              scope
+              value
+              valueType
+            }
+            shop {
+              _id
+              currency {
+                code
+              }
+            }
+            pricing {
+              compareAtPrice {
+                displayAmount
+              }
+              currency {
+                code
+              }
+              price
+              displayPrice
+              minPrice
+              maxPrice
+            }
+            primaryImage {
+              URLs {
+                thumbnail
+                small
+                medium
+                large
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

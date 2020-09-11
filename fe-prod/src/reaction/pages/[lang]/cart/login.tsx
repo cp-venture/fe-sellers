@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Login = ({ router }) => {
   const classes = useStyles();
-  const { locale, t } = useTranslation("common"); // eslint-disable-line no-unused-vars, id-length
+  //const { locale, t } = useTranslation("common"); // eslint-disable-line no-unused-vars, id-length
   const shop = useShop();
 
   const {
@@ -85,7 +85,7 @@ const Login = ({ router }) => {
     isLoadingCart,
     setEmailOnAnonymousCart
   } = useCart();
-  const hasIdentity = !!((cart && cart.account !== null) || (cart && cart.email));
+  const hasIdentity = !!((cart &&  cart?.account !== null) || (cart &&  cart?.email));
   const pageTitle = `Login | ${shop && shop.name}`;
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export async function getStaticProps({ params: { lang } }) {
   return {
     props: {
       ...await fetchPrimaryShop(lang),
-      ...await fetchTranslations(lang, ["common"])
+      //...await fetchTranslations(lang, ["common"])
     }
   };
 }

@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext", "esnext.asynciterable"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "isolatedModules": true,
+    "baseUrl": "src",
+    "paths": {
+      "*": [
+        "*",
+        "reaction/*",
+        "../*",
+        "paper-kit-react/src/*"
+      ]
+    }
+  },
+  "exclude": ["node_modules", "src"],
+  "include": [
+    "next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
+}

@@ -263,7 +263,7 @@ class ProgressiveImage extends Component {
   render() {
     const { className, presrc, imgW, imgH } = this.props;
     const { ready } = this.state;
-    console.log(imgH, imgW, "Pulkitiifasd,,,")
+    //--console.log(imgH, imgW, "Pulkitiifasd,,,")
     return (
       <ImageWrapper imgH={imgH} imgW={imgW} className={className} ref={(wrapper) => { this._wrapper = wrapper; }}>
         {ready ? this.renderImage() : null}

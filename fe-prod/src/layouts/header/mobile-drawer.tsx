@@ -150,9 +150,6 @@ const MobileDrawer: React.FunctionComponent = () => {
   return (
     <Drawer
       width="316px"
-      style={{
-        top: "79px"
-      }}
       drawerHandler={
         <HamburgerIcon>
           <span />

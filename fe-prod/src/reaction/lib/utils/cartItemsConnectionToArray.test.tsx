@@ -41,7 +41,7 @@ const cart = {
 };
 
 test("cartItemsConnectionToArray should convert a Relay style connection into a simple array of objects", () => {
-  const result = cartItemsConnectionToArray(cart.items);
+  const result = cartItemsConnectionToArray( cart?.items);
 
   const expected = [
     {

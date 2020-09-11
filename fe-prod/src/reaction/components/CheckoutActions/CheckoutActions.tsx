@@ -154,7 +154,7 @@ class CheckoutActions extends Component {
       const { data } = group;
       const { selectedFulfillmentOption } = group;
 
-      const items = cart.items.map((item) => ({
+      const items =  cart?.items.map((item) => ({
         addedAt: item.addedAt,
         price: item.price.amount,
         productConfiguration: item.productConfiguration,
@@ -176,7 +176,7 @@ class CheckoutActions extends Component {
       currencyCode: checkout.summary.total.currency.code,
       email: orderEmailAddress,
       fulfillmentGroups,
-      shopId: cart.shop._id
+      shopId:  cart?.shop._id
     };
 
     return this.setState({ isPlacingOrder: true }, () => this.placeOrder(order));

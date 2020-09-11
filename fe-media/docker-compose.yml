@@ -1,0 +1,48 @@
+version: '2'
+networks:
+  web:
+    external: true
+services:
+  mariadb:
+    image: 'docker.io/bitnami/mariadb:10.3-debian-10'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_ghost
+      - MARIADB_DATABASE=bitnami_ghost
+    volumes:
+      - 'mariadb_data:/bitnami'
+  ghost:
+    image: 'docker.io/bitnami/ghost:3-debian-10'
+    environment:
+      - MARIADB_HOST=mariadb
+      - MARIADB_PORT_NUMBER=3306
+      - GHOST_DATABASE_USER=bn_ghost
+      - GHOST_DATABASE_NAME=bitnami_ghost
+      - ALLOW_EMPTY_PASSWORD=yes
+      - GHOST_HOST=localhost
+    volumes:
+      - 'ghost_data:/bitnami'
+    depends_on:
+      - mariadb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fe-media.entrypoints=http"
+      - "traefik.http.routers.fe-media.rule=Host(`media.craflo.com`)"
+      - "traefik.http.middlewares.fe-media-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.fe-media.middlewares=fe-media-https-redirect"
+      - "traefik.http.routers.fe-media-secure.entrypoints=https"
+      - "traefik.http.routers.fe-media-secure.rule=Host(`media.craflo.com`)"
+      - "traefik.http.routers.fe-media-secure.tls=true"
+      - "traefik.http.routers.fe-media-secure.service=fe-media"
+      - "traefik.http.services.fe-media.loadbalancer.server.port=2368"
+      - "traefik.docker.network=web"
+
+    networks:
+      web:
+      default:
+
+volumes:
+  mariadb_data:
+    driver: local
+  ghost_data:
+    driver: local

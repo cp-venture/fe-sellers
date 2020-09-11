@@ -91,7 +91,7 @@ const Checkout = ({ router }) => {
   const classes = useStyles();
   const { cartStore } = useStores();
   const shop = useShop();
-  const { locale, t } = useTranslation("common"); // eslint-disable-line no-unused-vars, id-length
+  //const { locale, t } = useTranslation("common"); // eslint-disable-line no-unused-vars, id-length
   const apolloClient = useApolloClient();
   // TODO: implement address validation
   // const [addressValidation, addressValidationResults] = useAddressValidation();
@@ -111,7 +111,7 @@ const Checkout = ({ router }) => {
   const [availablePaymentMethods = [], isLoadingAvailablePaymentMethods] = useAvailablePaymentMethods();
 
   const { asPath } = router;
-  const hasIdentity = !!((cart && cart.account !== null) || (cart && cart.email));
+  const hasIdentity = !!((cart &&  cart?.account !== null) || (cart &&  cart?.email));
   const pageTitle = hasIdentity ? `Checkout | ${shop && shop.name}` : `Login | ${shop && shop.name}`;
 
   useEffect(() => {
@@ -145,7 +145,7 @@ const Checkout = ({ router }) => {
     }
 
     if (hasIdentity && cart) {
-      if (cart && Array.isArray(cart.items) && cart.items.length === 0) {
+      if (cart && Array.isArray( cart?.items) &&  cart?.items.length === 0) {
         return (
           <div className={classes.emptyCartContainer}>
             <div className={classes.emptyCart}>
@@ -157,8 +157,8 @@ const Checkout = ({ router }) => {
         );
       }
 
-      const orderEmailAddress = (cart && cart.account && Array.isArray(cart.account.emailRecords) &&
-        cart.account.emailRecords[0].address) || (cart ? cart.email : null);
+      const orderEmailAddress = (cart &&  cart?.account && Array.isArray( cart?.account.emailRecords) &&
+         cart?.account.emailRecords[0].address) || (cart ?  cart?.email : null);
 
       // Filter the hard-coded definedPaymentMethods list from the client to remove any
       // payment methods that were not returned from the API as currently available.
@@ -241,7 +241,7 @@ export async function getStaticProps({ params: { lang } }) {
   return {
     props: {
       ...await fetchPrimaryShop(lang),
-      ...await fetchTranslations(lang, ["common"])
+     // ...await fetchTranslations(lang, ["common"])
     }
   };
 }

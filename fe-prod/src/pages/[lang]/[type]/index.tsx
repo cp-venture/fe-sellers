@@ -1,4 +1,5 @@
-import React from 'react';
+// @ts-nocheck
+import React, {useEffect} from 'react';
 import { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -30,6 +31,9 @@ import withCatalogItems from "containers/catalog/withCatalogItems";
 import withCart from "containers/cart/withCart";
 import {DrawerWrapper, MobileHeaderInnerWrapper} from "src/layouts/header/header.style";
 import Menu from "src/layouts/header/menu";
+import Footer from "src/layouts/footer";
+import Grid from '@material-ui/core/Grid';
+import useStores from "hooks/useStores";
 
 const Sidebar = dynamic(() => import('src/layouts/sidebar/sidebar'));
 const SidebarMenu = dynamic(() => import('src/layouts/sidebar/sidebarMenu'));
@@ -42,6 +46,10 @@ const CartPopUp = dynamic(() => import('src/features/carts/cart-popup'), {
 
 const CategoryPage: React.FC<any> = ({ deviceType }) => {
   const { query } = useRouter();
+
+  const {uiStore} = useStores();
+  uiStore.closeMenuDrawer()
+
   const { elRef: targetRef, scroll } = useRefScroll({
     percentOfElement: 0,
     percentOfContainer: 0,
@@ -55,65 +63,47 @@ const CategoryPage: React.FC<any> = ({ deviceType }) => {
   const PAGE_TYPE: any = query.type;
   const page = PAGES_DATA[PAGE_TYPE];
 
+  useEffect(() => {
+  }, [uiStore.isMenuDrawerOpen]);
+
   return (
     <>
       <SEO title={page?.page_title} description={page?.page_description} />
 
       <Modal>
         <Banner
-          intlTitleId={page?.banner_title_id}
-          intlDescriptionId={page?.banner_description_id}
-          imageUrl={page?.banner_image_url}
-        />
-
-        <MobileCarouselDropdown>
-          <StoreNav items={storeType} />
-          <Sidebar type={PAGE_TYPE} deviceType={deviceType} />
-        </MobileCarouselDropdown>
-
-
-
-
-
-        <OfferSection>
-          <div style={{ margin: '0 -10px' }}>
-            <Carousel deviceType={deviceType} data={OFFERS} />
-          </div>
-        </OfferSection>
-        <MainContentArea>
-            <SidebarSection>
-              <SidebarMenu type={PAGE_TYPE} deviceType={deviceType} />
-            </SidebarSection>
-            <ContentSection>
-              <div ref={targetRef}>
-                <OfferSection>
-                  <div style={{ margin: '0 -10px' }}>
-                    <Carousel deviceType={deviceType} data={OFFERS} />
-                  </div>
-                </OfferSection>
-
-                <OfferSection>
-                  <div style={{ margin: '0 -10px' }}>
-                    <Carousel deviceType={deviceType} data={OFFERS} />
-                  </div>
-                </OfferSection>
-
-                <OfferSection>
-                  <div style={{ margin: '0 -10px' }}>
-                    <Carousel deviceType={deviceType} data={OFFERS} />
-                  </div>
-                </OfferSection>
+              intlTitleId={page?.banner_title_id}
+              intlDescriptionId={page?.banner_description_id}
+              imageUrl={page?.banner_image_url}
+            />
+            <MobileCarouselDropdown>
+              <StoreNav items={storeType} />
+              <Sidebar type={PAGE_TYPE} deviceType={deviceType} />
+            </MobileCarouselDropdown>
+            <OfferSection>
+              <div style={{ margin: '0 -10px' }}>
+                <Carousel deviceType={deviceType} data={OFFERS} />
               </div>
-            </ContentSection>
-
-
-
-        </MainContentArea>
+            </OfferSection>
+            <MainContentArea>
+                <ContentSection>
+                  <div ref={targetRef}>
+                    <OfferSection>
+                      <div style={{ margin: '0 -10px' }}>
+                        <Carousel deviceType={deviceType} data={OFFERS} />
+                      </div>
+                    </OfferSection>
+                    <Footer />
+                  </div>
+                </ContentSection>
+            </MainContentArea>
         <CartPopUp deviceType={deviceType} />
       </Modal>
     </>
   );
 };
+
+
 export const getStaticProps: GetStaticProps = async ({ params: { lang, type } }) => {
   const primaryShop = await fetchPrimaryShop(lang);
   //const translations = await fetchTranslations(lang, ["common"]);
@@ -188,4 +178,4 @@ export async function getStaticPaths() {
     fallback: false,
   };
 }
-export default  withApollo()(withCatalogItems(inject("routingStore", "uiStore")(CategoryPage)));
+export default  withApollo()(withCatalogItems(inject("routingStore")(CategoryPage)));

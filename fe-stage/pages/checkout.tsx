@@ -17,17 +17,13 @@ type Props = {
   };
 };
 const CheckoutPage: NextPage<Props> = ({ deviceType }) => {
-  const { data, error, loading } = useQuery(GET_LOGGED_IN_CUSTOMER);
-  if (loading) {
-    return <div>loading...</div>;
-  }
-  if (error) return <div>{error.message}</div>;
+
   const token = 'true';
 
   return (
     <>
       <SEO title="Checkout - PickBazar" description="Checkout Details" />
-      <ProfileProvider initData={data.me}>
+      <ProfileProvider initData={{}}>
         <Modal>
           <Checkout token={token} deviceType={deviceType} />
         </Modal>
@@ -37,15 +33,10 @@ const CheckoutPage: NextPage<Props> = ({ deviceType }) => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const apolloClient = initializeApollo();
-
-  await apolloClient.query({
-    query: GET_LOGGED_IN_CUSTOMER,
-  });
 
   return {
     props: {
-      initialApolloState: apolloClient.cache.extract(),
+      initialApolloState: null //apolloClient.cache.extract(),
     },
   };
 };

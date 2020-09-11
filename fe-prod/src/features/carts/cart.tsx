@@ -34,6 +34,8 @@ type CartPropsType = {
   className?: string;
   scrollbarHeight?: string;
   onCloseBtnClick?: (e: any) => void;
+  useReactionCart: any;
+  cartContents: any;
 };
 
 const APPLY_COUPON = gql`
@@ -51,7 +53,8 @@ const Cart: React.FC<CartPropsType> = ({
   className,
   onCloseBtnClick,
   scrollbarHeight,
-  useReactionCart
+  useReactionCart,
+  cartContents
 }) => {
   let {
     items,
@@ -65,9 +68,9 @@ const Cart: React.FC<CartPropsType> = ({
   } = useCart();
 
 
-  items = useReactionCart.cart.items
-  cartItemsCount = useReactionCart.cart.totalItemQuantity
-  calculatePrice = () => useReactionCart.cart.checkout ? useReactionCart.cart.checkout.summary.total.amount : 0
+  items = cartContents?.items
+  cartItemsCount = cartContents?.totalItemQuantity
+  calculatePrice = () => cartContents?.checkout ? cartContents?.checkout.summary.total.amount : 0
 
 
   const [couponText, setCoupon] = useState('');
@@ -197,7 +200,7 @@ const Cart: React.FC<CartPropsType> = ({
         </PromoCode>
 
         {cartItemsCount !== 0 ? (
-          <Link href='/en/checkout'>
+          <Link href='/checkout'>
             <CheckoutButton onClick={onCloseBtnClick}>
               <>
                 <Title>

@@ -124,7 +124,7 @@ class MiniCart extends Component {
   renderMiniCart() {
     const { cart, classes, hasMoreCartItems, loadMoreCartItems } = this.props;
 
-    if (cart && Array.isArray(cart.items) && cart.items.length) {
+    if (cart && Array.isArray( cart?.items) &&  cart?.items.length) {
       return (
         <MiniCartComponent
           cart={cart}
@@ -167,10 +167,10 @@ class MiniCart extends Component {
             onMouseLeave={this.handlePopperClose}
             onClick={this.handleOnClick}
           >
-            {(cart && cart.totalItemQuantity > 0)
+            {(cart &&  cart?.totalItemQuantity > 0)
               ? (
                 <Badge
-                  badgeContent={cart.totalItemQuantity}
+                  badgeContent={ cart?.totalItemQuantity}
                   color="primary"
                   classes={{ badge: classes.badge }}
                 >

@@ -31,46 +31,16 @@ const CartPopupStyle = createGlobalStyle`
   }
 `;
 
-type CartProps = {
-  deviceType: {
-    mobile: boolean;
-    tablet: boolean;
-    desktop: boolean;
-  };
-  cart: {
-    totalItems: any;
-    items: any;
-    checkout: {
-      fulfillmentTotal: {
-        displayAmount: any;
-      };
-      itemTotal: {
-        displayAmount: any;
-      };
-      taxTotal: {
-        displayAmount: any;
-      }
-    }
-    hasMoreCartItems: any;
-    loadMoreCartItems: any;
-    onChangeCartItemsQuantity: any;
-    onRemoveCartItems: any;
-    shop: {
-      name: any;
-      description: any;
-    }
-  }
-};
-
-const CartPopUp: React.FC<CartProps> = ({
+const CartPopUp = ({
   deviceType: { mobile, tablet, desktop },
+  cart,
   ...useReactionCart
 }) => {
   let { isOpen, cartItemsCount, toggleCart, calculatePrice } = useCart();
 
-  cartItemsCount = useReactionCart.cart.totalItemQuantity
-  calculatePrice = () => useReactionCart.cart.checkout ? useReactionCart.cart.checkout.summary.total.amount : 0
-  console.log("asdfsdf lakshyy", useReactionCart)
+  cartItemsCount =  cart?.totalItemQuantity
+  calculatePrice = () =>  cart?.checkout ?  cart?.checkout.summary.total.amount : 0
+  //--console.log("asdfsdf lakshyy", useReactionCart)
 
 
   const handleModal = () => {
@@ -120,7 +90,7 @@ const CartPopUp: React.FC<CartProps> = ({
         <>
           <CartSlidePopup className={cartSliderClass}>
             {isOpen && (
-              <Cart  useReactionCart = {useReactionCart} onCloseBtnClick={toggleCart} scrollbarHeight="100vh" />
+              <Cart cartContents={cart} useReactionCart = {useReactionCart} onCloseBtnClick={toggleCart} scrollbarHeight="100vh" />
             )}
           </CartSlidePopup>
 

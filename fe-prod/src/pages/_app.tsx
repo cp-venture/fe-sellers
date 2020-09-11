@@ -1,3 +1,4 @@
+//@ts-nocheck
 import NextApp from "next/app";
 import React from "react";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
@@ -5,7 +6,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { ContextProviders } from "context/ContextProviders";
 import { ComponentsProvider } from "@reactioncommerce/components-context";
 import components from "custom/componentsContext";
-// import theme from "custom/reactionTheme";
+import muiTheme from "custom/reactionTheme";
 
 
 
@@ -68,7 +69,7 @@ function withDevice(Component) {
     const mobile = useMedia('(max-width: 580px)');
     const tablet = useMedia('(max-width: 991px)');
     const desktop = useMedia('(min-width: 992px)');
-    const apolloClient = useApollo();
+    const apolloClient = useApollo({});
     return (
       <Component {...props} apolloClient={apolloClient} deviceType={{ mobile, tablet, desktop }} />
     )
@@ -89,20 +90,21 @@ class App extends NextApp {
 
   render() {
     const { apolloClient, Component, pageProps, ...rest } = this.props;
-    console.log(this.props)
+    //--console.log(this.props)
 
     return (
       <ContextProviders pageProps={pageProps}>
         <ComponentsProvider value={components}>
-          <MuiThemeProvider theme={theme}>
-            <ApolloProvider client={apolloClient}>
+          <ApolloProvider client={apolloClient}>
             <ThemeProvider theme={theme}>
               <LanguageProvider messages={messages}>
                 <CartProvider>
                   <AppProvider>
                     <AuthProvider>
                       <AppLayout>
-                        <Component {...rest} {...pageProps} />
+                        <MuiThemeProvider theme={muiTheme}>
+                          <Component {...rest} {...pageProps} />
+                        </MuiThemeProvider>
                       </AppLayout>
                       <GlobalStyle />
                     </AuthProvider>
@@ -110,8 +112,7 @@ class App extends NextApp {
                 </CartProvider>
               </LanguageProvider>
             </ThemeProvider>
-            </ApolloProvider>
-          </MuiThemeProvider>
+          </ApolloProvider>
         </ComponentsProvider>
       </ContextProviders>
     );

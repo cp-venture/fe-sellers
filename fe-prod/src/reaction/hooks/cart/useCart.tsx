@@ -76,14 +76,14 @@ export default function useCart() {
   }, [cartData, cartDataAnonymous, shouldSkipAccountCartByAccountIdQuery, shouldSkipAnonymousCartByCartIdQuery]);
 
   const pageInfo = useMemo(() => {
-    if (cart && cart.items) return cart.items.pageInfo;
+    if (cart &&  cart?.items) return  cart?.items.pageInfo;
     return {};
   }, [cart]);
 
   // With an authenticated cart, set the accountCartId for later use
   useEffect(() => {
-    if (cart && cart.account && cart.account._id === (viewer && viewer._id)) {
-      cartStore.setAccountCartId(cart._id);
+    if (cart &&  cart?.account &&  cart?.account._id === (viewer && viewer._id)) {
+      cartStore.setAccountCartId( cart?._id);
     } else {
       cartStore.setAccountCartId(null);
     }
@@ -104,11 +104,11 @@ export default function useCart() {
 
   const [addOrCreateCartMutation, {
     loading: addOrCreateCartLoading
-  }] = useMutation(cart && cart._id ? addCartItemsMutation : createCartMutation, {
+  }] = useMutation(cart &&  cart?._id ? addCartItemsMutation : createCartMutation, {
     onCompleted(addOrCreateCartMutationData) {
       if (addOrCreateCartMutationData && addOrCreateCartMutationData.createCart && (!viewer || !viewer._id)) {
         const { cart: cartPayload, token } = addOrCreateCartMutationData.createCart;
-        console.log(addOrCreateCartMutationData)
+        //--console.log(addOrCreateCartMutationData)
         cartStore.setAnonymousCartCredentials(cartPayload._id, token);
       }
       refetchCart();
@@ -231,12 +231,12 @@ export default function useCart() {
   if (cart) {
     processedCartData = {
       ...cart,
-      items: cartItemsConnectionToArray(cart.items)
+      items: cartItemsConnectionToArray( cart?.items)
     };
   }
 
   return {
-    addItemsToCart: (items) => handleAddItemsToCart({ items }, !cart || !cart._id),
+    addItemsToCart: (items) => handleAddItemsToCart({ items }, !cart || ! cart?._id),
     addOrCreateCartLoading,
     cart: processedCartData,
     checkoutMutations: {
@@ -271,7 +271,7 @@ export default function useCart() {
 
         // Update fulfillment options for current cart
         const { data: { setShippingAddressOnCart } } = response;
-        handleUpdateFulfillmentOptionsForGroup(setShippingAddressOnCart.cart.checkout.fulfillmentGroups[0]._id);
+        handleUpdateFulfillmentOptionsForGroup(setShippingAddressOnCart. cart?.checkout.fulfillmentGroups[0]._id);
 
         return response;
       }
@@ -294,10 +294,10 @@ export default function useCart() {
               cart: {
                 ...fetchMoreCart,
                 items: {
-                  __typename: previousResult.cart.items.__typename,
+                  __typename: previousResult.cart?.items.__typename,
                   pageInfo: fetchMoreCart.items.pageInfo,
                   edges: [
-                    ...previousResult.cart.items.edges,
+                    ...previousResult.cart?.items.edges,
                     ...fetchMoreCart.items.edges
                   ]
                 }

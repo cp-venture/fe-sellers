@@ -14,6 +14,7 @@ export const PopoverWrapper = styled.div`
     display: none;
   }
 
+
   .popover-handler {
     display: block;
     padding: 15px;
@@ -66,6 +67,7 @@ export const SidebarWrapper = styled.div`
   padding-top: 35px;
   padding-right: 0;
 
+
   @media (max-width: 1199px) {
     padding: 40px 0px;
     padding-right: 0;
@@ -80,6 +82,8 @@ export const SidebarWrapper = styled.div`
 export const CategoryWrapper = styled.div`
   position: relative;
   width: 100%;
+  transition: 0.15s ease-in-out;
+  background: #ffffff
 `;
 
 export const TreeWrapper = styled.div`

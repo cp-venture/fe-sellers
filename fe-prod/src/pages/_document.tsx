@@ -15,8 +15,10 @@ class HTMLDocument extends Document {
   render() {
     const links = [
       { rel: "canonical", href: process.env.CANONICAL_URL },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Montserrat&display=swap" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Lato:400,700%7CPoppins:700&display=swap" },
+
       ...favicons
     ];
     const meta = [
@@ -37,11 +39,7 @@ class HTMLDocument extends Document {
       ...analyticsProviders.map((provider) => ({
         type: "text/javascript",
         innerHTML: provider.renderScript()
-      })),
-      {
-        type: "text/javascript",
-        src: "https://js.stripe.com/v3/"
-      }
+      }))
     ];
 
     return (

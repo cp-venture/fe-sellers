@@ -81,7 +81,7 @@ class Login extends Component {
 
   componentDidMount() {
     const { cart } = this.props;
-    if ((cart && cart.account !== null) || (cart && cart.email)) Router.back();
+    if ((cart &&  cart?.account !== null) || (cart &&  cart?.email)) Router.back();
   }
 
   renderHeader() {
@@ -139,7 +139,7 @@ export async function getStaticProps({ params: { lang } }) {
   return {
     props: {
       ...await fetchPrimaryShop(lang),
-      ...await fetchTranslations(lang, ["common"])
+      //...await fetchTranslations(lang, ["common"])
     }
   };
 }

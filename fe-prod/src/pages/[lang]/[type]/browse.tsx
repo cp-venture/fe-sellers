@@ -1,15 +1,15 @@
+// @ts-nocheck
 import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import dynamic from 'next/dynamic';
-import {LabeledInput, InputRow} from './demo/LabeledInput';
+//import {LabeledInput, InputRow} from './demo/LabeledInput';
 import createCellPositioner from './Masonry/createCellPositioner';
 const GeneralCard = dynamic(
   import('components/product-card/product-card-listing/product-card-listing')
 );
+const Sidebar = dynamic(() => import('src/layouts/sidebar/sidebar'));
 import Fade from 'react-reveal/Fade';
-
-
 
 import { Link, Element } from 'react-scroll';
 import { Button } from 'components/button/button';
@@ -39,7 +39,7 @@ import {
   HelpText,
   ItemPrice,
   CartWrapper,
-} from './product-details-three.style';
+} from 'src/components/product-details/product-details-three/product-details-three.style';
 import { CURRENCY } from 'utils/constant';
 import FixedCart from 'features/carts/fixed-cart';
 import FixedCartPopup from 'features/carts/fixed-cart-popup';
@@ -48,13 +48,19 @@ import Sticky from 'react-stickynode';
 import { groupBy } from 'utils/groupBy';
 import { useCart } from 'contexts/cart/use-cart';
 import { PlusOutline } from 'components/AllSvgIcon';
-
-
-
-
-
-
-//import styles from './demo/Masonry.example.css';
+import { NextPage, GetStaticProps } from 'next';
+import StoreNav from "src/components/store-nav/store-nav";
+import storeType from "src/constants/storeType";
+import {useRefScroll} from "src/utils/use-ref-scroll";
+import {Banner} from "src/components/banner/banner";
+import {useAppDispatch} from "src/contexts/app/app.provider";
+import { useCallback } from 'react';
+import {withApollo} from "lib/apollo/withApollo";
+import withCatalogItems from "containers/catalog/withCatalogItems";
+import inject from "hocs/inject";
+import { inPageSizes } from "lib/utils/pageSizes";
+import PageLoading from "components/PageLoading/PageLoading";
+import ProductGridEmptyMessage from "components/ProductGrid/ProductGridEmptyMessage";
 import {Masonry, WindowScroller, AutoSizer, CellMeasurer, CellMeasurerCache} from 'react-virtualized';
 import {SEO} from "src/components/seo";
 import {
@@ -68,26 +74,24 @@ import {
 import GiftCard from "src/components/gift-card/gift-card";
 import Footer from "src/layouts/footer";
 import CartPopUp from "src/features/carts/cart-popup";
-
 import { Modal } from '@redq/reuse-modal';
+import fetchPrimaryShop from "staticUtils/shop/fetchPrimaryShop";
+import fetchTranslations from "staticUtils/translations/fetchTranslations";
 
 
+
+const ProductsContext = React.createContext({} as any)
 
 class ProductMasonry extends React.PureComponent {
-  static contextTypes = {
-    list: PropTypes.instanceOf(Immutable.List).isRequired,
-  };
+  static contextType = ProductsContext
 
   constructor(props, context) {
     super(props, context);
-
-    this.context.list= Immutable.List([0,0 ,0])
     this._columnCount = 0;
-
     this._cache = new CellMeasurerCache({
       defaultHeight: 250,
       defaultWidth: 200,
-      fixedWidth: true,
+      fixedWidth: true
     });
 
     this.state = {
@@ -95,7 +99,7 @@ class ProductMasonry extends React.PureComponent {
       height: 300,
       gutterSize: 35,
       overscanByPixels: 0,
-      windowScrollerEnabled: true,
+      windowScrollerEnabled: true
     };
 
     this._cellRenderer = this._cellRenderer.bind(this);
@@ -115,19 +119,20 @@ class ProductMasonry extends React.PureComponent {
     } = this.state;
 
     let child;
-
     if (windowScrollerEnabled) {
       child = (
         <WindowScroller overscanByPixels={overscanByPixels}>
           {this._renderAutoSizer}
         </WindowScroller>
       );
-    } else {
+    }
+    else {
       child = this._renderAutoSizer({height});
     }
 
     return (
       <>
+        {/*
         <InputRow>
           <LabeledInput
             label="Height"
@@ -185,6 +190,7 @@ class ProductMasonry extends React.PureComponent {
             value={overscanByPixels}
           />
         </InputRow>
+        */}
 
         {child}
       </>
@@ -193,19 +199,19 @@ class ProductMasonry extends React.PureComponent {
 
   _calculateColumnCount() {
     const {columnWidth, gutterSize} = this.state;
-
     this._columnCount = Math.floor(this._width / (columnWidth + gutterSize));
   }
 
   _cellRenderer({index, key, parent, style}) {
-    const {list} = this.context;
+    const products = this.context;
+    //--console.log(products, "pulkiii")
     const {columnWidth} = this.state;
-
-    const datum = list.get(index % list.size);
-
-    const imgH = Math.ceil(200 + ((1 + (index % 10)) / 10) * 400)
-    const imgW = 302
-
+    const p = products[index % products.length];
+    const media = JSON.parse(p.metafields[0].value)
+    const imgW = 442
+    const imgH = Math.ceil((imgW / media[0].full_width ) * media[0].full_height)
+    //Math.ceil(200 + ((1 + (index % 10)) / 10) * 400)
+    //--console.log(p.pricing[0].maxPrice, "klkllk")
     return (
       <CellMeasurer cache={this._cache} index={index} key={key} parent={parent}>
         <div
@@ -215,7 +221,7 @@ class ProductMasonry extends React.PureComponent {
           }}>
           <div
             style={{
-              backgroundColor: datum.color,
+              backgroundColor: p.color,
               borderRadius: '0.5rem',
               height: (imgH + 130)/16 + 'rem',
               marginBottom: '0.5rem',
@@ -227,15 +233,16 @@ class ProductMasonry extends React.PureComponent {
               justifyContent: 'center',
             }}>
             <GeneralCard
-              title="Art Belly"
-              description="best mud arts"
-              image={"https://lorempixel.com/"+ imgW +"/"+imgH+"/"}
+              title={p.title}
+              description={p.description}
+              image={media[0].url_570xN}
               imgH={imgH/16 + "rem"}
               imgW={imgW/16 + "rem"}
               currency="USD"
-              price={3454}
-              salePrice={23}
+              price={p.pricing[0].maxPrice + ""}
+              salePrice={(p.pricing[0].maxPrice)*0.8 + ""}
               discountInPercent={2}
+              product_data = {p}
             />
           </div>
         </div>
@@ -246,7 +253,6 @@ class ProductMasonry extends React.PureComponent {
   _initCellPositioner() {
     if (typeof this._cellPositioner === 'undefined') {
       const {columnWidth, gutterSize} = this.state;
-
       this._cellPositioner = createCellPositioner({
         cellMeasurerCache: this._cache,
         columnCount: this._columnCount,
@@ -258,7 +264,6 @@ class ProductMasonry extends React.PureComponent {
 
   _onResize({width}) {
     this._width = width;
-
     this._calculateColumnCount();
     this._resetCellPositioner();
     this._masonry.recomputeCellPositions();
@@ -267,9 +272,7 @@ class ProductMasonry extends React.PureComponent {
   _renderAutoSizer({height, scrollTop}) {
     this._height = height;
     this._scrollTop = scrollTop;
-
     const {overscanByPixels} = this.state;
-
     return (
       <AutoSizer
         disableHeight
@@ -284,7 +287,6 @@ class ProductMasonry extends React.PureComponent {
 
   _renderMasonry({width}) {
     this._width = width;
-
     this._calculateColumnCount();
     this._initCellPositioner();
 
@@ -295,6 +297,7 @@ class ProductMasonry extends React.PureComponent {
         autoHeight={windowScrollerEnabled}
         cellCount={1000}
         cellMeasurerCache={this._cache}
+        cellPositioner={this._cellPositioner}
         cellPositioner={this._cellPositioner}
         cellRenderer={this._cellRenderer}
         height={windowScrollerEnabled ? this._height : height}
@@ -335,16 +338,10 @@ class ProductMasonry extends React.PureComponent {
   }
 }
 
-const Sidebar = dynamic(() => import('src/layouts/sidebar/sidebar'));
-import { NextPage, GetStaticProps } from 'next';
-import StoreNav from "src/components/store-nav/store-nav";
-import storeType from "src/constants/storeType";
-import {useRefScroll} from "src/utils/use-ref-scroll";
-import {Banner} from "src/components/banner/banner";
-import {useAppDispatch} from "src/contexts/app/app.provider";
-import { useCallback } from 'react';
 
-const listing: NextPage = ({ deviceType }) => {
+
+const ProductListingPage: NextPage = ({ deviceType, ...props }) => {
+  //--console.log(props, "sdsdd---pulkit")
 
   const { elRef: targetRef, scroll } = useRefScroll({
     percentOfElement: 0,
@@ -356,33 +353,65 @@ const listing: NextPage = ({ deviceType }) => {
     dispatch,
   ]);
   setSticky()
+
+
   const productGroups = [
       "sort",
       "price",
       "color",
       "occasion"
   ]
+  props.routingStore.setTagId(null);
+
+  const setPageSize = (pageSize) => {
+    props.routingStore.setSearch({ limit: pageSize });
+    props.uiStore.setPageSize(pageSize);
+  };
+
+  const setSortBy = (sortBy) => {
+    props.routingStore.setSearch({ sortby: sortBy });
+    props.uiStore.setSortBy(sortBy);
+  };
 
   const headerOffset = deviceType.mobile || deviceType.tablet ? -137 : -177;
+  const {
+      catalogItems,
+      catalogItemsPageInfo,
+      isLoadingCatalogItems,
+      routingStore: { query },
+      shop,
+      uiStore
+  } = props;
+  const pageSize = query && inPageSizes(query.limit) ? parseInt(query.limit, 10) : uiStore.pageSize;
+  const sortBy = query && query.sortby ? query.sortby : uiStore.sortBy;
+
+
+  let pageTitle;
+  if (shop) {
+      pageTitle = shop.name;
+      if (shop.description) pageTitle = `${pageTitle} | ${shop.description}`;
+  } else {
+    pageTitle = "Storefront";
+  }
+
+  if (isLoadingCatalogItems) return <PageLoading />;
+  const products = (catalogItems || []).map((item) => item.node.product);
+  if (products.length === 0) return "Sorry, We currently don't have products of choice";
 
   return (
-
     <>
     <SEO title="Browse Listings - Craflo" description="find your own craft" />
     <Modal>
-
+      <div style={{margin: "2rem" }} />
       <MobileCarouselDropdown>
         <StoreNav items={storeType} />
         <Sidebar type={"Grocery"} deviceType={deviceType} />
       </MobileCarouselDropdown>
-        <MainContentArea>
-          <SidebarSection>
-            <Sidebar type={"Grocery"} deviceType={deviceType} />
-          </SidebarSection>
-          <ContentSection>
+
             <ProductPreview>
               <img src={"https://media.gettyimages.com/photos/making-paper-flowersart-and-craft-concept-picture-id1149218784"} />
             </ProductPreview>
+
             <Sticky
               top={deviceType.mobile || deviceType.tablet ? 68 : 78}
               innerZ={999}
@@ -407,11 +436,11 @@ const listing: NextPage = ({ deviceType }) => {
               </CategoriesWrapper>
             </Sticky>
             <div style={{height: "90px"}} />
-              <ProductMasonry />
-
-          </ContentSection>
-
-        </MainContentArea>
+            <div style={{margin: "2rem" }}>
+              <ProductsContext.Provider value={products} >
+                <ProductMasonry />
+              </ProductsContext.Provider>
+            </div>
         <Footer />
       <CartPopUp deviceType={deviceType}/>
     </Modal>
@@ -419,5 +448,53 @@ const listing: NextPage = ({ deviceType }) => {
   )
 }
 
-export default listing
+export const getStaticProps: GetStaticProps = async ({ params: { lang, type } }) => {
+  const primaryShop = await fetchPrimaryShop(lang);
+  //const translations = await fetchTranslations(lang, ["common"]);
+
+  if (!primaryShop) {
+    return {
+      props: {
+        shop: null,
+        //...translations,
+        type,
+        lang,
+        initialApolloState: null  //apolloClient.cache.extract(),
+      },
+      // eslint-disable-next-line camelcase
+      unstable_revalidate: 1 // Revalidate immediately
+    };
+  }
+  //--console.log(primaryShop, "pulkit0009")
+
+  return {
+    props: {
+      ...primaryShop,
+      //...translations,
+      type,
+      lang,
+      initialApolloState: null  //apolloClient.cache.extract(),
+    },
+    // eslint-disable-next-line camelcase
+    unstable_revalidate: 120 // Revalidate each two minutes
+  };
+};
+
+export async function getStaticPaths() {
+  return {
+    paths: [
+      { params: { lang: 'in', type: 'grocery' } },
+      { params: { lang: 'us', type: 'makeup' } },
+      { params: { lang: 'fr', type: 'bags' } },
+      { params: { lang: 'gb', type: 'book' } },
+      { params: { lang: 'ru', type: 'medicine' } },
+      { params: { lang: 'ca', type: 'furniture' } },
+      { params: { lang: 'au', type: 'clothing' } },
+    ],
+    fallback: false,
+  };
+}
+
+export default withApollo()(withCatalogItems(inject("routingStore", "uiStore", "authStore")(ProductListingPage)));
+
 

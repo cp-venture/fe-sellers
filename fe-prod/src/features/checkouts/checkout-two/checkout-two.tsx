@@ -57,15 +57,27 @@ import Sticky from 'react-stickynode';
 
 import { ProfileContext } from 'contexts/profile/profile.context';
 import { FormattedMessage } from 'react-intl';
-import { useCart } from 'contexts/cart/use-cart';
+import useCart from "hooks/cart/useCart";
+import { useCart as usePBCart } from 'contexts/cart/use-cart';
 import { APPLY_COUPON } from 'graphql/mutation/coupon';
 import { useLocale } from 'contexts/language/language.provider';
 import { useWindowSize } from 'utils/useWindowSize';
 import {Header, SavedCard} from "src/components/payment-group/payment-group.style";
-import {placeOrderMutation} from "hooks/orders/placeOrder.gql";
+//import {placeOrderMutation} from "hooks/orders/placeOrder.gql";
 import PageLoading from "components/PageLoading/PageLoading";
 import calculateRemainderDue from "lib/utils/calculateRemainderDue";
+import { NextPage, GetStaticProps } from 'next';
+import { useQuery } from '@apollo/react-hooks';
+import { Modal } from '@redq/reuse-modal';
+import { SEO } from 'src/components/seo';
+import Checkout from 'src/features/checkouts/checkout-two/checkout-two';
+import { GET_LOGGED_IN_CUSTOMER } from 'src/graphql/query/customer.query';
 
+import { ProfileProvider } from 'src/contexts/profile/profile.provider';
+import { useApolloClient } from "@apollo/client";
+import CartEmptyMessage from "@reactioncommerce/components/CartEmptyMessage/v1";
+import { StripeProvider } from "react-stripe-elements";
+import { withApollo } from "lib/apollo/withApollo";
 
 ///reaction imports
 import { isEqual } from "lodash";
@@ -79,6 +91,14 @@ import withAddressValidation from "containers/address/withAddressValidation";
 import Dialog from "@material-ui/core/Dialog";
 
 import styled from "styled-components";
+import useStores from "hooks/useStores";
+import useShop from "hooks/shop/useShop";
+import useTranslation from "hooks/useTranslation";
+import useAvailablePaymentMethods from "hooks/availablePaymentMethods/useAvailablePaymentMethods";
+import definedPaymentMethods from "custom/paymentMethods";
+import CheckoutSummary from "components/CheckoutSummary/CheckoutSummary";
+import CheckoutActions from "components/CheckoutActions/CheckoutActions";
+import Layout from "components/Layout/Layout";
 const MessageDiv = styled.div`
   ${addTypographyStyles("NoPaymentMethodsMessage", "bodyText")}
 `;
@@ -117,7 +137,28 @@ const OrderItem: React.FC<CartItemProps> = ({ product }) => {
   );
 };
 
-const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
+const CheckoutWithSidebar = ({ deviceType, ...props }) => {
+
+  const { cartStore } = useStores();
+  const shop = useShop();
+  //const { locale, t } = useTranslation("common"); // eslint-disable-line no-unused-vars, id-length
+  const apolloClient = useApolloClient();
+  // TODO: implement address validation
+  // const [addressValidation, addressValidationResults] = useAddressValidation();
+  const [stripe, setStripe] = React.useState();
+
+  const {
+    cart,
+    isLoadingCart,
+    checkoutMutations,
+    clearAuthenticatedUsersCart,
+    hasMoreCartItems,
+    loadMoreCartItems,
+    onRemoveCartItems,
+    onChangeCartItemsQuantity
+  } = useCart();
+
+
   const [hasCoupon, setHasCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setError] = useState('');
@@ -134,7 +175,7 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
     calculateSubTotalPrice,
     isRestaurant,
     toggleRestaurant,
-  } = useCart();
+  } = usePBCart();
   const [loading, setLoading] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const { address, contact, card, schedules } = state;
@@ -144,17 +185,22 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
   const [deletePaymentCardMutation] = useMutation(DELETE_CARD);
   const [appliedCoupon] = useMutation(APPLY_COUPON);
   const size = useWindowSize();
-  console.log(props)
-  // return (<></>)
+  //--console.log(props)
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    if (isValid) {
-      clearCart();
-      Router.push('/order-received');
-    }
-    setLoading(false);
-  };
+
+  //--console.log(cart, "Pulkitt")
+
+  const [availablePaymentMethods = [], isLoadingAvailablePaymentMethods] = useAvailablePaymentMethods();
+  const hasIdentity = !!((cart &&  cart?.account !== null) || (cart &&  cart?.email));
+  //const pageTitle = hasIdentity ? `Checkout | ${shop && shop.name}` : `Login | ${shop && shop.name}`;
+  const orderEmailAddress = (cart &&  cart?.account && Array.isArray( cart?.account.emailRecords) &&
+     cart?.account.emailRecords[0].address) || (cart ?  cart?.email : null);
+  const token = 'true';
+
+  // Filter the hard-coded definedPaymentMethods list from the client to remove any
+  // payment methods that were not returned from the API as currently available.
+  const paymentMethods = definedPaymentMethods.filter((method) =>
+    !!availablePaymentMethods.find((availableMethod) => availableMethod.name === method.name));
 
   useEffect(() => {
     if (
@@ -168,14 +214,74 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
       setIsValid(true);
     }
   }, [state]);
-  useEffect(() => {
-    return () => {
-      if (isRestaurant) {
-        toggleRestaurant();
-        clearCart();
-      }
-    };
-  }, []);
+
+
+
+  React.useEffect(() => {
+    // Skipping if the `cart` is not available
+    if (!cart) return;
+    //if (!hasIdentity) {
+    //Router.push("/cart/login");
+    //}
+  }), [cart, hasIdentity, Router]; // eslint-disable-line no-sequences
+
+/*
+  React.useEffect(() => {
+    if (!stripe && process.env.STRIPE_PUBLIC_API_KEY && window && window.Stripe) {
+      //setStripe(window.Stripe(process.env.STRIPE_PUBLIC_API_KEY));
+    }
+  }), [stripe]; // eslint-disable-line no-sequences
+*/
+
+  if (!cart) {
+    return (
+      <div id ="emptyCartContainer">
+        <div id = "emptyCart">
+          <div>
+            <CartEmptyMessage onClick={() => Router.push("/")} messageText="Your Shopping Cart is Empty" buttonText="Continue Shopping" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasIdentity && cart) {
+    if (cart && Array.isArray( cart?.items) &&  cart?.items.length === 0) {
+      return (
+        <div id="emptyCartContainer">
+          <div id="emptyCart">
+            <div>
+              <CartEmptyMessage onClick={() => Router.push("/")} messageText="Your Shopping Cart is Empty"
+                                buttonText="Continue Shopping"/>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  }
+
+
+
+  if (isLoadingCart || isLoadingAvailablePaymentMethods) {
+    return (
+      <Layout shop={shop}>
+        <PageLoading delay={0} />
+      </Layout>
+    );
+  }
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    if (isValid) {
+      clearCart();
+      Router.push('/order-received');
+    }
+    setLoading(false);
+  };
+
+
+
+
   // Add or edit modal
   const handleModal = (
     modalComponent: any,
@@ -241,6 +347,7 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
   const handleOnUpdate = (code: any) => {
     setCouponCode(code);
   };
+
 
 /// rection checkout start here: cart/checkout.tsx
 //
@@ -353,7 +460,7 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
 //       const { data } = group;
 //       const { selectedFulfillmentOption } = group;
 //
-//       const items = cart.items.map((item) => ({
+//       const items =  cart?.items.map((item) => ({
 //         addedAt: item.addedAt,
 //         price: item.price.amount,
 //         productConfiguration: item.productConfiguration,
@@ -375,7 +482,7 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
 //       currencyCode: checkout.summary.total.currency.code,
 //       email: orderEmailAddress,
 //       fulfillmentGroups,
-//       shopId: cart.shop._id
+//       shopId:  cart?.shop._id
 //     };
 //
 //     return setRState({ isPlacingOrder: true }, () => this.placeOrder(order));
@@ -545,40 +652,42 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
         <CheckoutContainer>
           <CheckoutInformation>
 
-            {/* Login Form */}
-            <InformationBox>
-              <Heading>
-                <FormattedMessage
-                  id='loginCheckoutText'
-                  defaultMessage='Login'
-                />
-              </Heading>
-              <ButtonGroup>
-                <RadioGroup
-                  items={contact}
-                  component={(item: any) => (
-                    <RadioCard
-                      id={item.id}
-                      key={item.id}
-                      title={item.type}
-                      content={item.number}
-                      checked={item.type === 'primary'}
-                      onChange={() =>
-                        dispatch({
-                          type: 'SET_PRIMARY_CONTACT',
-                          payload: item.id.toString(),
-                        })
-                      }
-                      name='contact'
-                      onEdit={() => handleEditDelete(item, 'edit', 'contact')}
-                      onDelete={() =>
-                        handleEditDelete(item, 'delete', 'contact')
-                      }
-                    />
-                  )}
-                />
-              </ButtonGroup>
-            </InformationBox>
+            {/* Login Form *//*
+              <InformationBox>
+                <Heading>
+                  <FormattedMessage
+                    id='loginCheckoutText'
+                    defaultMessage='Login'
+                  />
+                </Heading>
+                <ButtonGroup>
+                  <RadioGroup
+                    items={contact}
+                    component={(item: any) => (
+                      <RadioCard
+                        id={item.id}
+                        key={item.id}
+                        title={item.type}
+                        content={item.number}
+                        checked={item.type === 'primary'}
+                        onChange={() =>
+                          dispatch({
+                            type: 'SET_PRIMARY_CONTACT',
+                            payload: item.id.toString(),
+                          })
+                        }
+                        name='contact'
+                        onEdit={() => handleEditDelete(item, 'edit', 'contact')}
+                        onDelete={() =>
+                          handleEditDelete(item, 'delete', 'contact')
+                        }
+                      />
+                    )}
+                  />
+                </ButtonGroup>
+              </InformationBox>*/
+            }
+
 
             {/* DeliveryAddress */}
             <InformationBox>
@@ -718,7 +827,7 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
               <PaymentGroup
                 name='payment'
                 deviceType={deviceType}
-                items={card}
+                items={[]}
                 onEditDeleteField={(item: any, type: string) =>
                   handleEditDelete(item, type, 'payment')
                 }
@@ -880,8 +989,8 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
                   )}
                 >
                   <ItemsWrapper>
-                    {props.cart.items.length > 0 ? (
-                      props.cart.items.map((item) => (
+                    { cart?.items.length > 0 ? (
+                       cart?.items.map((item) => (
                         <OrderItem key={`cartItem-${item._id}`} product={item} />
                       ))
                     ) : (
@@ -960,4 +1069,4 @@ const CheckoutWithSidebar: React.FC = ({ token, deviceType, ...props }) => {
   );
 };
 
-export default withAddressValidation(CheckoutWithSidebar);
+export default withApollo()(withAddressValidation(CheckoutWithSidebar));

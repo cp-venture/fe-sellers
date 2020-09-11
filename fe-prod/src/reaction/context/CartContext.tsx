@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 const ANONYMOUS_CART_ID_KEY_NAME = "anonymousCartId";
 const ANONYMOUS_CART_TOKEN_KEY_NAME = "anonymousCartToken";
 
-export const CartContext = createContext();
+export const CartContext = createContext({} as any);
 
 export const CartProvider = ({ children }) => {
   const [anonymousCartId, setAnonymousCartId] = useState();

@@ -9,16 +9,16 @@ export default (req, res) => {
 
   const fallback = "de";
   const allowedLocales = [
-    { name: "de-DE", locale: "de" },
-    { name: "de", locale: "de" },
-    { name: "en-AU", locale: "en" },
-    { name: "en-IN", locale: "en" },
-    { name: "en-CA", locale: "en" },
-    { name: "en-NZ", locale: "en" },
-    { name: "en-US", locale: "en" },
-    { name: "en-ZA", locale: "en" },
-    { name: "en-GB", locale: "en" },
-    { name: "en", locale: "en" }
+    { name: "de-DE", locale: "in" },
+    { name: "de", locale: "in" },
+    { name: "en-AU", locale: "in" },
+    { name: "en-IN", locale: "in" },
+    { name: "en-CA", locale: "in" },
+    { name: "en-NZ", locale: "in" },
+    { name: "en-US", locale: "in" },
+    { name: "en-ZA", locale: "in" },
+    { name: "en-GB", locale: "in" },
+    { name: "en", locale: "in" }
   ];
 
   const detections = headerLanguage(req);

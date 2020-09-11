@@ -31,7 +31,7 @@ services:
       - empty_node_modules:/usr/local/src/app/node_modules
     env_file:
       - ./.env
-    
+
     networks:
       default:
       reaction:
